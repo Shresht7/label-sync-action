@@ -295,7 +295,7 @@ const writeLabelMessage = (mode, label) => {
         const b = parseInt(hex.substring(4, 6), 16);
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`;
     };
-    return `${colorMap.CREATE}${mode[0] + mode.substr(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
+    return `${colorMap.CREATE}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
 };
 exports.writeLabelMessage = writeLabelMessage;
 
