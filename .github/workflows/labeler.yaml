@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 jobs:
   labeler:
     runs-on: ubuntu-latest
-    name: Gets and console.logs labels from this repo
+    name: Labeler
 
     steps:
       # To use this repository's private action,
