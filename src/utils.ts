@@ -20,21 +20,13 @@ export const getLabels = async (octokit: octokit, github: github): Promise<GitHu
 //  ===========
 
 //  Reads labels from .github/labels.yaml
-export const readLabels = (yaml: ConfigYAML) => {
-    let labels: GitHubLabel[] = yaml.repoLabels
-    //  Formats color property
-    const formatColor = (color: string|number) => {
-        color = color.toString()
-        if (color[0] === '#') {
-            color = color.substr(1)
-        }
-        return color
-    }
+export const readLabels = (config: ConfigYAML) => {
+    let labels: GitHubLabel[] = config.repoLabels
 
-    //  Remaps labels array
+    //  Remaps labels array after removing # from colors (if any)
     labels = labels.map(label => ({
         ...label,
-        color: formatColor(label.color)
+        color: label.color[0] === '#' ? label.color.substr(1) : label.color
     }))
 
     return labels
@@ -81,7 +73,7 @@ export const labelSorter = (existingLabelsMap: Map<string, GitHubLabel>, configL
 
 //  Colors the string in core.info messages
 export const colorString = (str: string, hex: string) => {
-    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex
+    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff'
     const r = parseInt(hex.substring(0, 2), 16)
     const g = parseInt(hex.substring(2, 4), 16)
     const b = parseInt(hex.substring(4, 6), 16)

@@ -106,50 +106,89 @@ const octokit = new utils_1.GitHub({ auth: GITHUB_ACCESS_TOKEN });
 //  ===========
 //  YAML CONFIG
 //  ===========
-const yaml = config_1.readYAML(core);
+const config = config_1.readYAML(core);
 //  =================
 //  RUN GITHUB ACTION
 //  =================
 //  Runs the GitHub Action
 const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
+    //  GET EXISTING LABELS
+    //  ===================
     const existingLabelsMap = new Map();
     const existingLabels = yield utils_2.getLabels(octokit, github);
     existingLabels.forEach(label => existingLabelsMap.set(label.name, label));
+    //  GET CONFIG LABELS
+    //  =================
     const configLabelsMap = new Map();
-    const configLabels = utils_2.readLabels(yaml);
+    const configLabels = utils_2.readLabels(config);
     configLabels.forEach(label => configLabelsMap.set(label.name, label));
+    //  SORT LABELS INTO ACTIONABLE CATEGORIES
     const [createLabels, updateLabels, deleteLabels] = utils_2.labelSorter(existingLabelsMap, configLabelsMap);
     //  CREATE LABELS
+    //  =============
     core.info('\u001b[37;1m\nCREATE LABELS\u001b[0m');
-    createLabels.forEach(labelName => {
+    createLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = configLabelsMap.get(labelName);
-        core.info(`\u001b[32;1mCreating\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
-        if (yaml.dryRun) {
+        if (!label) {
             return;
         }
-        //  DO REAL STUFF HERE
-    });
+        core.info(`\u001b[32;1mCreating\u001b[0m ${utils_2.colorString(label.name, label === null || label === void 0 ? void 0 : label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        if (config.dryRun) {
+            return;
+        }
+        //  REAL STUFF HERE
+        yield octokit.issues.createLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            name: label.name,
+            color: label.color || '000000',
+            description: label.description || ''
+        });
+    }));
     //  UPDATE LABELS
+    //  =============
     core.info('\u001b[37;1m\nUPDATE LABELS\u001b[0m');
-    updateLabels.forEach(labelName => {
+    updateLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = configLabelsMap.get(labelName);
+        if (!label) {
+            return;
+        }
         core.info(`\u001b[34;1mUpdating\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
-        if (yaml.dryRun) {
+        if (config.dryRun) {
             return;
         }
-        //  DO REAL STUFF HERE
-    });
+        //  REAL STUFF HERE
+        yield octokit.issues.updateLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            name: label.name,
+            color: label.color || '000000',
+            description: label.description || ''
+        });
+    }));
     //  DELETE LABELS
+    //  =============
     core.info('\u001b[37;1m\nDELETE LABELS\u001b[0m');
-    deleteLabels.forEach(labelName => {
+    deleteLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = existingLabelsMap.get(labelName);
-        core.info(`\u001b[31;1mDeleting\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
-        if (yaml.dryRun) {
+        if (!label) {
             return;
         }
-        //  DO REAL STUFF HERE
-    });
+        core.info(`\u001b[31;1mDeleting\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        if (config.dryRun) {
+            return;
+        }
+        //  REAL STUFF HERE
+        yield octokit.issues.deleteLabel({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            name: label.name
+        });
+    }));
 });
+//  ==============
+//  EXECUTE ACTION
+//  ==============
 //  Try running GitHub Action and catch errors if any
 try {
     runAction();
@@ -194,18 +233,10 @@ exports.getLabels = getLabels;
 //  READ LABELS
 //  ===========
 //  Reads labels from .github/labels.yaml
-const readLabels = (yaml) => {
-    let labels = yaml.repoLabels;
-    //  Formats color property
-    const formatColor = (color) => {
-        color = color.toString();
-        if (color[0] === '#') {
-            color = color.substr(1);
-        }
-        return color;
-    };
-    //  Remaps labels array
-    labels = labels.map(label => (Object.assign(Object.assign({}, label), { color: formatColor(label.color) })));
+const readLabels = (config) => {
+    let labels = config.repoLabels;
+    //  Remaps labels array after removing # from colors (if any)
+    labels = labels.map(label => (Object.assign(Object.assign({}, label), { color: label.color[0] === '#' ? label.color.substr(1) : label.color })));
     return labels;
 };
 exports.readLabels = readLabels;
@@ -244,7 +275,7 @@ exports.labelSorter = labelSorter;
 //  ============
 //  Colors the string in core.info messages
 const colorString = (str, hex) => {
-    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex;
+    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff';
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);

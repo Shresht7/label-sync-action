@@ -24,3 +24,5 @@ export interface ConfigYAML {
     dryRun?: boolean
     repoLabels: GitHubLabel[]
 }
+
+export type LabelsMap = Map<string, GitHubLabel>
