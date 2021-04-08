@@ -80,7 +80,12 @@ typings/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+
+#   TypeScript output
+build
+
+#   GitHub Action requires this folder
+# dist
 
 # Gatsby files
 .cache/
