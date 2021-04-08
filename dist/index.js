@@ -1,6 +1,64 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 6179:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.readYAML = void 0;
+const fs = __importStar(__nccwpck_require__(5747));
+const path = __importStar(__nccwpck_require__(5622));
+const YAML = __importStar(__nccwpck_require__(9967));
+//  ================
+//  READ CONFIG YAML
+//  ================
+const readYAML = (core) => {
+    //  Get Workspace URL
+    const workspaceURL = process.env.GITHUB_WORKSPACE || '';
+    if (!workspaceURL) {
+        core.setFailed('Failed to read GitHub workspace URL');
+    }
+    //  Read Labels from ./.github/labels.yaml
+    let file;
+    const url = path.join(workspaceURL, '.github', 'labels.yaml');
+    try {
+        file = fs.readFileSync(url, 'utf8');
+    }
+    catch (err) {
+        file = '';
+    } //  If readFileSync fails, assume empty yaml
+    const yaml = YAML.parse(file);
+    if (!yaml) {
+        core.setFailed('Failed to read ./.github/labels.yaml');
+    }
+    return yaml;
+};
+exports.readYAML = readYAML;
+
+
+/***/ }),
+
 /***/ 6711:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -38,21 +96,59 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(115));
 const github = __importStar(__nccwpck_require__(3007));
 const utils_1 = __nccwpck_require__(1767);
+const config_1 = __nccwpck_require__(6179);
 const utils_2 = __nccwpck_require__(3072);
 //  =======
 //  OCTOKIT
 //  =======
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN;
 const octokit = new utils_1.GitHub({ auth: GITHUB_ACCESS_TOKEN });
+//  ===========
+//  YAML CONFIG
+//  ===========
+const yaml = config_1.readYAML(core);
 //  =================
 //  RUN GITHUB ACTION
 //  =================
 //  Runs the GitHub Action
 const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
+    const existingLabelsMap = new Map();
     const existingLabels = yield utils_2.getLabels(octokit, github);
-    existingLabels.forEach(label => console.log(label.name, label.color, label.description));
-    const configLabels = utils_2.readLabels(core);
-    configLabels.forEach(label => console.log(label.name, label.color, label.description));
+    existingLabels.forEach(label => existingLabelsMap.set(label.name, label));
+    const configLabelsMap = new Map();
+    const configLabels = utils_2.readLabels(yaml);
+    configLabels.forEach(label => configLabelsMap.set(label.name, label));
+    const [createLabels, updateLabels, deleteLabels] = utils_2.labelSorter(existingLabelsMap, configLabelsMap);
+    //  CREATE LABELS
+    core.info('\u001b[37;1m\nCREATE LABELS\u001b[0m');
+    createLabels.forEach(labelName => {
+        const label = configLabelsMap.get(labelName);
+        core.info(`\u001b[32;1mCreating\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        if (yaml.dryRun) {
+            return;
+        }
+        //  DO REAL STUFF HERE
+    });
+    //  UPDATE LABELS
+    core.info('\u001b[37;1m\nUPDATE LABELS\u001b[0m');
+    updateLabels.forEach(labelName => {
+        const label = configLabelsMap.get(labelName);
+        core.info(`\u001b[34;1mUpdating\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        if (yaml.dryRun) {
+            return;
+        }
+        //  DO REAL STUFF HERE
+    });
+    //  DELETE LABELS
+    core.info('\u001b[37;1m\nDELETE LABELS\u001b[0m');
+    deleteLabels.forEach(labelName => {
+        const label = existingLabelsMap.get(labelName);
+        core.info(`\u001b[31;1mDeleting\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        if (yaml.dryRun) {
+            return;
+        }
+        //  DO REAL STUFF HERE
+    });
 });
 //  Try running GitHub Action and catch errors if any
 try {
@@ -66,29 +162,10 @@ catch (err) {
 /***/ }),
 
 /***/ 3072:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -99,10 +176,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readLabels = exports.getLabels = void 0;
-const fs = __importStar(__nccwpck_require__(5747));
-const path = __importStar(__nccwpck_require__(5622));
-const YAML = __importStar(__nccwpck_require__(9967));
+exports.colorString = exports.labelSorter = exports.readLabels = exports.getLabels = void 0;
 //  ==========
 //  GET LABELS
 //  ==========
@@ -120,25 +194,7 @@ exports.getLabels = getLabels;
 //  READ LABELS
 //  ===========
 //  Reads labels from .github/labels.yaml
-const readLabels = (core) => {
-    //  Get Workspace URL
-    const workspaceURL = process.env.GITHUB_WORKSPACE || '';
-    if (!workspaceURL) {
-        core.setFailed('Failed to read GitHub workspace URL');
-    }
-    //  Read Labels from ./.github/labels.yaml
-    let file;
-    const url = path.join(workspaceURL, '.github', 'labels.yaml');
-    try {
-        file = fs.readFileSync(url, 'utf8');
-    }
-    catch (err) {
-        file = '';
-    } //  If readFileSync fails, assume empty yaml
-    const yaml = YAML.parse(file);
-    if (!yaml) {
-        core.setFailed('Failed to read ./.github/labels.yaml');
-    }
+const readLabels = (yaml) => {
     let labels = yaml.repoLabels;
     //  Formats color property
     const formatColor = (color) => {
@@ -153,6 +209,48 @@ const readLabels = (core) => {
     return labels;
 };
 exports.readLabels = readLabels;
+//  ===========
+//  SORT LABELS
+//  ===========
+//  Sorts label into create, update and delete categories
+const labelSorter = (existingLabelsMap, configLabelsMap) => {
+    const createLabels = [];
+    const updateLabels = [];
+    const deleteLabels = [];
+    //  Create and Update lists
+    configLabelsMap.forEach((label, labelName) => {
+        //  If Label already exists ...
+        if (existingLabelsMap.has(labelName)) {
+            const existingLabel = existingLabelsMap.get(labelName);
+            //  ... and has property mismatch
+            if (label.color !== (existingLabel === null || existingLabel === void 0 ? void 0 : existingLabel.color) || label.description !== existingLabel.description) {
+                updateLabels.push(labelName); //  Sort in updateLabels array
+            }
+            //  If Label does not exist
+        }
+        else {
+            createLabels.push(labelName); //  Sort in createLabels array
+        }
+    });
+    //  Delete list
+    existingLabelsMap.forEach((label, labelName) => {
+        !configLabelsMap.has(labelName) && deleteLabels.push(labelName);
+    });
+    return [createLabels, updateLabels, deleteLabels];
+};
+exports.labelSorter = labelSorter;
+//  ============
+//  COLOR STRING
+//  ============
+//  Colors the string in core.info messages
+const colorString = (str, hex) => {
+    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex;
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`;
+};
+exports.colorString = colorString;
 
 
 /***/ }),

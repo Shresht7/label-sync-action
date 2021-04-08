@@ -1,8 +1,4 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import * as YAML from 'yaml'
-
-import { core, octokit, github, GitHubLabel } from './typedefs'
+import { octokit, github, GitHubLabel, ConfigYAML } from './typedefs'
 
 //  ==========
 //  GET LABELS
@@ -24,21 +20,8 @@ export const getLabels = async (octokit: octokit, github: github): Promise<GitHu
 //  ===========
 
 //  Reads labels from .github/labels.yaml
-export const readLabels = (core: core) => {
-    //  Get Workspace URL
-    const workspaceURL = process.env.GITHUB_WORKSPACE || ''
-    if (!workspaceURL) { core.setFailed('Failed to read GitHub workspace URL') }
-
-    //  Read Labels from ./.github/labels.yaml
-    let file
-    const url = path.join(workspaceURL, '.github', 'labels.yaml')
-    try { file = fs.readFileSync(url, 'utf8') }
-    catch(err) { file = '' }    //  If readFileSync fails, assume empty yaml
-    
-    const yaml = YAML.parse(file)
-    if (!yaml) { core.setFailed('Failed to read ./.github/labels.yaml') }
+export const readLabels = (yaml: ConfigYAML) => {
     let labels: GitHubLabel[] = yaml.repoLabels
-
     //  Formats color property
     const formatColor = (color: string|number) => {
         color = color.toString()
@@ -55,4 +38,53 @@ export const readLabels = (core: core) => {
     }))
 
     return labels
+}
+
+//  ===========
+//  SORT LABELS
+//  ===========
+
+//  Sorts label into create, update and delete categories
+export const labelSorter = (existingLabelsMap: Map<string, GitHubLabel>, configLabelsMap: Map<string, GitHubLabel>): string[][] => {
+    const createLabels: string[] = []
+    const updateLabels: string[] = []
+    const deleteLabels: string[] = []
+
+    //  Create and Update lists
+    configLabelsMap.forEach((label, labelName) => {
+
+        //  If Label already exists ...
+        if (existingLabelsMap.has(labelName)) {
+            const existingLabel = existingLabelsMap.get(labelName)
+            //  ... and has property mismatch
+            if (label.color !== existingLabel?.color || label.description !== existingLabel.description) {
+                updateLabels.push(labelName)    //  Sort in updateLabels array
+            }
+
+        //  If Label does not exist
+        } else {
+            createLabels.push(labelName)    //  Sort in createLabels array
+        }
+    })
+
+    //  Delete list
+    existingLabelsMap.forEach((label, labelName) => {
+        !configLabelsMap.has(labelName) && deleteLabels.push(labelName)
+    })
+
+    return [createLabels, updateLabels, deleteLabels]
+}
+
+//  ============
+//  COLOR STRING
+//  ============
+
+//  Colors the string in core.info messages
+export const colorString = (str: string, hex: string) => {
+    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+
+    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`
 }

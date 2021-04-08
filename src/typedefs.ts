@@ -1,4 +1,3 @@
-
 //  ================
 //  TYPE DEFINITIONS
 //  ================
@@ -19,4 +18,9 @@ export interface GitHubLabel {
     description: string | null
     color: string
     default: boolean
+}
+
+export interface ConfigYAML {
+    dryRun?: boolean
+    repoLabels: GitHubLabel[]
 }
