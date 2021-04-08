@@ -1,5 +1,5 @@
-name: "Hello World"
-description: "Hello World!"
+name: "Repo-Labels"
+description: "Creates, updates and deletes labels from your repositories"
 
 runs:
   using: "node12"

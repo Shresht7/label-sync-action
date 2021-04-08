@@ -25,15 +25,72 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(115));
 const github = __importStar(__nccwpck_require__(7));
+const utils_1 = __nccwpck_require__(767);
+const utils_2 = __nccwpck_require__(72);
+//  =======
+//  OCTOKIT
+//  =======
+const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN;
+const octokit = new utils_1.GitHub({ auth: GITHUB_ACCESS_TOKEN });
+//  =================
+//  RUN GITHUB ACTION
+//  =================
+//  Runs the GitHub Action
+const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
+    const labels = yield utils_2.getLabels(octokit, github);
+    labels.forEach(label => console.log(label.name, label.color, label.description));
+});
+//  Try running GitHub Action and catch errors if any
 try {
-    console.log(github.context.repo.owner);
+    runAction();
 }
 catch (err) {
     core.setFailed(err.message);
 }
+
+
+/***/ }),
+
+/***/ 72:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getLabels = void 0;
+//  ==========
+//  GET LABELS
+//  ==========
+//  Gets all labels in current repository
+const getLabels = (octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data } = yield octokit.issues.listLabelsForRepo({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo
+    });
+    return data;
+});
+exports.getLabels = getLabels;
 
 
 /***/ }),

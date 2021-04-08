@@ -1,14 +1,18 @@
 on: [push, workflow_dispatch]
 
 jobs:
-  hello_world_job:
+  labeler:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Gets and console.logs labels from this repo
+
     steps:
       # To use this repository's private action,
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
+
+      - name: Labeler
         uses: ./ # Uses an action in the root directory
-        id: hello
+        id: labeler
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
