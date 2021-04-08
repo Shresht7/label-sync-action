@@ -92,5 +92,5 @@ export const writeLabelMessage = (mode: 'CREATE'|'UPDATE'|'DELETE', label: GitHu
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`
     }
 
-    return `${colorMap.CREATE}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`
+    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`
 }

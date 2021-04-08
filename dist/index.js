@@ -129,6 +129,10 @@ const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
     configLabels.forEach(label => configLabelsMap.set(label.name, label));
     //  SORT LABELS INTO ACTIONABLE CATEGORIES
     const [createLabels, updateLabels, deleteLabels] = utils_2.labelSorter(existingLabelsMap, configLabelsMap);
+    //  Dry Run Message
+    if (config.dryRun) {
+        core.warning('This is a dry run');
+    }
     //  CREATE LABELS
     //  =============
     core.info('\nCREATE LABELS');
@@ -295,7 +299,7 @@ const writeLabelMessage = (mode, label) => {
         const b = parseInt(hex.substring(4, 6), 16);
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`;
     };
-    return `${colorMap.CREATE}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
+    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
 };
 exports.writeLabelMessage = writeLabelMessage;
 

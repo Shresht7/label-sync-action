@@ -45,6 +45,9 @@ const runAction = async () => {
     //  SORT LABELS INTO ACTIONABLE CATEGORIES
     const [createLabels, updateLabels, deleteLabels] = labelSorter(existingLabelsMap, configLabelsMap)
     
+    //  Dry Run Message
+    if (config.dryRun) { core.warning('This is a dry run') }
+
     //  CREATE LABELS
     //  =============
 
