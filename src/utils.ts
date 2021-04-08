@@ -67,16 +67,30 @@ export const labelSorter = (existingLabelsMap: Map<string, GitHubLabel>, configL
     return [createLabels, updateLabels, deleteLabels]
 }
 
-//  ============
-//  COLOR STRING
-//  ============
+//  ===================
+//  WRITE LABEL MESSAGE
+//  ===================
 
-//  Colors the string in core.info messages
-export const colorString = (str: string, hex: string) => {
-    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff'
-    const r = parseInt(hex.substring(0, 2), 16)
-    const g = parseInt(hex.substring(2, 4), 16)
-    const b = parseInt(hex.substring(4, 6), 16)
+//  Returns the label message to be displayed on console
+export const writeLabelMessage = (mode: 'CREATE'|'UPDATE'|'DELETE', label: GitHubLabel): string => {
 
-    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`
+    //  Maps modes to ANSI colors
+    const colorMap = {
+        CREATE: '\u001b[32;1m',
+        UPDATE: '\u001b[34;1m',
+        DELETE: '\u001b[31;1m',
+        RESET: '\u001b[0m'
+    }
+
+    //  Colors the given string with hex color (converted to ANSI)
+    const colorString = (str: string, hex: string) => {
+        hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff'
+        const r = parseInt(hex.substring(0, 2), 16)
+        const g = parseInt(hex.substring(2, 4), 16)
+        const b = parseInt(hex.substring(4, 6), 16)
+    
+        return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`
+    }
+
+    return `${colorMap.CREATE}${mode[0] + mode.substr(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`
 }

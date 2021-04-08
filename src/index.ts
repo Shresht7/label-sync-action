@@ -3,7 +3,7 @@ import * as github from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
 
 import { readYAML } from './config'
-import { colorString, getLabels, labelSorter, readLabels } from './utils'
+import { getLabels, labelSorter, readLabels, writeLabelMessage } from './utils'
 
 import {  LabelsMap } from './typedefs'
 
@@ -12,6 +12,7 @@ import {  LabelsMap } from './typedefs'
 //  =======
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN
+if (!GITHUB_ACCESS_TOKEN) { core.setFailed(`Invalid GITHUB_ACCESS_TOKEN`) }
 const octokit = new GitHub({ auth: GITHUB_ACCESS_TOKEN })
 
 //  ===========
@@ -47,11 +48,11 @@ const runAction = async () => {
     //  CREATE LABELS
     //  =============
 
-    core.info('\u001b[37;1m\nCREATE LABELS\u001b[0m')
+    core.info('\nCREATE LABELS')
     createLabels.forEach(async (labelName) => {
         const label = configLabelsMap.get(labelName)
         if (!label) { return }
-        core.info(`\u001b[32;1mCreating\u001b[0m ${colorString(label.name, label?.color)} (${label?.description})`)
+        core.info(writeLabelMessage('CREATE', label))
         if (config.dryRun) { return }
         
         //  REAL STUFF HERE
@@ -67,11 +68,11 @@ const runAction = async () => {
     //  UPDATE LABELS
     //  =============
 
-    core.info('\u001b[37;1m\nUPDATE LABELS\u001b[0m')
+    core.info('\nUPDATE LABELS')
     updateLabels.forEach(async (labelName) => {
         const label = configLabelsMap.get(labelName)
         if (!label) { return }
-        core.info(`\u001b[34;1mUpdating\u001b[0m ${colorString(label.name, label.color)} (${label?.description})`)
+        core.info(writeLabelMessage('UPDATE', label))
         if (config.dryRun) { return }
         
         //  REAL STUFF HERE
@@ -87,11 +88,11 @@ const runAction = async () => {
     //  DELETE LABELS
     //  =============
 
-    core.info('\u001b[37;1m\nDELETE LABELS\u001b[0m')
+    core.info('\nDELETE LABELS')
     deleteLabels.forEach(async (labelName) => {
         const label = existingLabelsMap.get(labelName)
         if (!label) { return }
-        core.info(`\u001b[31;1mDeleting\u001b[0m ${colorString(label.name, label.color)} (${label?.description})`)
+        core.info(writeLabelMessage('DELETE', label))
         if (config.dryRun) { return }
         
         //  REAL STUFF HERE

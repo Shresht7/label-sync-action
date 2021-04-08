@@ -41,16 +41,18 @@ const readYAML = (core) => {
     }
     //  Read Labels from ./.github/labels.yaml
     let file;
+    const targetDir = path.join('.github', 'labels.yaml');
     const url = path.join(workspaceURL, '.github', 'labels.yaml');
     try {
         file = fs.readFileSync(url, 'utf8');
     }
     catch (err) {
+        core.warning(`Could not read ${targetDir}. Assuming empty file`);
         file = '';
     } //  If readFileSync fails, assume empty yaml
     const yaml = YAML.parse(file);
     if (!yaml) {
-        core.setFailed('Failed to read ./.github/labels.yaml');
+        core.setFailed(`Failed to read ${targetDir}`);
     }
     return yaml;
 };
@@ -102,6 +104,9 @@ const utils_2 = __nccwpck_require__(3072);
 //  OCTOKIT
 //  =======
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN;
+if (!GITHUB_ACCESS_TOKEN) {
+    core.setFailed(`Invalid GITHUB_ACCESS_TOKEN`);
+}
 const octokit = new utils_1.GitHub({ auth: GITHUB_ACCESS_TOKEN });
 //  ===========
 //  YAML CONFIG
@@ -126,13 +131,13 @@ const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
     const [createLabels, updateLabels, deleteLabels] = utils_2.labelSorter(existingLabelsMap, configLabelsMap);
     //  CREATE LABELS
     //  =============
-    core.info('\u001b[37;1m\nCREATE LABELS\u001b[0m');
+    core.info('\nCREATE LABELS');
     createLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = configLabelsMap.get(labelName);
         if (!label) {
             return;
         }
-        core.info(`\u001b[32;1mCreating\u001b[0m ${utils_2.colorString(label.name, label === null || label === void 0 ? void 0 : label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        core.info(utils_2.writeLabelMessage('CREATE', label));
         if (config.dryRun) {
             return;
         }
@@ -147,13 +152,13 @@ const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     //  UPDATE LABELS
     //  =============
-    core.info('\u001b[37;1m\nUPDATE LABELS\u001b[0m');
+    core.info('\nUPDATE LABELS');
     updateLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = configLabelsMap.get(labelName);
         if (!label) {
             return;
         }
-        core.info(`\u001b[34;1mUpdating\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        core.info(utils_2.writeLabelMessage('UPDATE', label));
         if (config.dryRun) {
             return;
         }
@@ -168,13 +173,13 @@ const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     //  DELETE LABELS
     //  =============
-    core.info('\u001b[37;1m\nDELETE LABELS\u001b[0m');
+    core.info('\nDELETE LABELS');
     deleteLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
         const label = existingLabelsMap.get(labelName);
         if (!label) {
             return;
         }
-        core.info(`\u001b[31;1mDeleting\u001b[0m ${utils_2.colorString(label.name, label.color)} (${label === null || label === void 0 ? void 0 : label.description})`);
+        core.info(utils_2.writeLabelMessage('DELETE', label));
         if (config.dryRun) {
             return;
         }
@@ -215,7 +220,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.colorString = exports.labelSorter = exports.readLabels = exports.getLabels = void 0;
+exports.writeLabelMessage = exports.labelSorter = exports.readLabels = exports.getLabels = void 0;
 //  ==========
 //  GET LABELS
 //  ==========
@@ -270,18 +275,29 @@ const labelSorter = (existingLabelsMap, configLabelsMap) => {
     return [createLabels, updateLabels, deleteLabels];
 };
 exports.labelSorter = labelSorter;
-//  ============
-//  COLOR STRING
-//  ============
-//  Colors the string in core.info messages
-const colorString = (str, hex) => {
-    hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff';
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`;
+//  ===================
+//  WRITE LABEL MESSAGE
+//  ===================
+//  Returns the label message to be displayed on console
+const writeLabelMessage = (mode, label) => {
+    //  Maps modes to ANSI colors
+    const colorMap = {
+        CREATE: '\u001b[32;1m',
+        UPDATE: '\u001b[34;1m',
+        DELETE: '\u001b[31;1m',
+        RESET: '\u001b[0m'
+    };
+    //  Colors the given string with hex color (converted to ANSI)
+    const colorString = (str, hex) => {
+        hex = hex.toString()[0] === '#' ? hex.substr(1) : hex || 'ffffff';
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`;
+    };
+    return `${colorMap.CREATE}${mode[0] + mode.substr(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
 };
-exports.colorString = colorString;
+exports.writeLabelMessage = writeLabelMessage;
 
 
 /***/ }),
