@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils'
 
-import { getLabels } from './utils'
+import { getLabels, readLabels } from './utils'
 
 //  =======
 //  OCTOKIT
@@ -17,8 +17,10 @@ const octokit = new GitHub({auth: GITHUB_ACCESS_TOKEN})
 
 //  Runs the GitHub Action
 const runAction = async () => {
-    const labels = await getLabels(octokit, github)
-    labels.forEach(label => console.log(label.name, label.color, label.description))
+    const existingLabels = await getLabels(octokit, github)
+    existingLabels.forEach(label => console.log(label.name, label.color, label.description))
+    const configLabels = readLabels(core)
+    configLabels.forEach(label => console.log(label.name, label.color, label.description))
 }
 
 //  Try running GitHub Action and catch errors if any

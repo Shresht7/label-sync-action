@@ -9,6 +9,7 @@ import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-
 
 export type octokit = { [x: string]: any } & { [x: string]: any } & Octokit & RestEndpointMethods & { paginate: PaginateInterface }
 export type github = typeof import("@actions/github")
+export type core = typeof import("@actions/core")
 
 export interface GitHubLabel {
     id: number

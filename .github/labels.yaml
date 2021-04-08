@@ -1,0 +1,12 @@
+repoLabels:
+  - name: bug
+    description: Something isn't working
+    color: EE1111
+
+  - name: documentation
+    description: Improvements or additions to the documentation
+    color: 0E8A16
+
+  - name: Refactor
+    description: Refactor code
+    color: 5319E7
