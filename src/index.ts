@@ -46,7 +46,7 @@ const runAction = async () => {
     const [createLabels, updateLabels, deleteLabels] = labelSorter(existingLabelsMap, configLabelsMap)
     
     //  Dry Run Message
-    if (config.dryRun) { core.warning('This is a dry run') }
+    if (config.dryRun) { core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m') }
 
     //  CREATE LABELS
     //  =============

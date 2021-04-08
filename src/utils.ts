@@ -1,4 +1,4 @@
-import { octokit, github, GitHubLabel, ConfigYAML } from './typedefs'
+import { octokit, github, GitHubLabel, ConfigYAML, LabelsMap } from './typedefs'
 
 //  ==========
 //  GET LABELS
@@ -37,7 +37,7 @@ export const readLabels = (config: ConfigYAML) => {
 //  ===========
 
 //  Sorts label into create, update and delete categories
-export const labelSorter = (existingLabelsMap: Map<string, GitHubLabel>, configLabelsMap: Map<string, GitHubLabel>): string[][] => {
+export const labelSorter = (existingLabelsMap: LabelsMap, configLabelsMap: LabelsMap): string[][] => {
     const createLabels: string[] = []
     const updateLabels: string[] = []
     const deleteLabels: string[] = []

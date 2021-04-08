@@ -131,7 +131,7 @@ const runAction = () => __awaiter(void 0, void 0, void 0, function* () {
     const [createLabels, updateLabels, deleteLabels] = utils_2.labelSorter(existingLabelsMap, configLabelsMap);
     //  Dry Run Message
     if (config.dryRun) {
-        core.warning('This is a dry run');
+        core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
     }
     //  CREATE LABELS
     //  =============
