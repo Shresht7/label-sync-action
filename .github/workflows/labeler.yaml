@@ -3,8 +3,8 @@ on:
     paths:
       - .github/labels.yaml
 
-  label
-  workflow_dispatch
+  label:
+  workflow_dispatch:
 
 jobs:
   labeler:
