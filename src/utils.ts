@@ -12,7 +12,15 @@ export const getLabels = async (octokit: octokit, github: github): Promise<GitHu
         repo: github.context.repo.repo
     })
 
-    return data
+    //  Returns a sub-set of data
+    const labels = data.map(label => ({
+            name: label.name,
+            color: label.color,
+            description: label.description
+        })
+    )
+
+    return labels
 }
 
 //  ===========

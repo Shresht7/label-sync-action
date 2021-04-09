@@ -1,32 +1,81 @@
+import * as fs from 'fs'
+import * as path from 'path'
+import * as YAML from 'yaml'
+
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { GitHub } from '@actions/github/lib/utils'
 
-import { readYAML } from './config'
+import { readConfigYAML as readConfig } from './config'
 import { getLabels, labelSorter, readLabels, writeLabelMessage } from './utils'
 
 import {  LabelsMap } from './typedefs'
 
-//  =======
-//  OCTOKIT
-//  =======
+//  ======
+//  CONFIG
+//  ======
 
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN
+const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN || ''
 if (!GITHUB_ACCESS_TOKEN) { core.setFailed(`Invalid GITHUB_ACCESS_TOKEN`) }
-const octokit = new GitHub({ auth: GITHUB_ACCESS_TOKEN })
+const octokit = github.getOctokit(GITHUB_ACCESS_TOKEN)
 
-//  ===========
-//  YAML CONFIG
-//  ===========
-
-const config = readYAML(core)
+const workspaceURL = process.env.GITHUB_WORKSPACE || ''
+const configPath = path.join('.github', 'labels.yaml') || ''
+const configPathURL = path.join(workspaceURL, configPath) || ''
+const [config, firstRun] = readConfig(configPathURL, core)
 
 //  =================
 //  RUN GITHUB ACTION
 //  =================
 
-//  Runs the GitHub Action
-const runAction = async () => {
+//  Responds to user editing repo-labels and syncs changes to .github/labels.yaml
+const syncYamlLabels = async () => {
+    let yamlContent = ''
+    if (!firstRun) {
+        const configLabels = readLabels(config)
+        const { eventName, payload: { action, label } } = github.context
+    } else {
+        const existingLabels = await getLabels(octokit, github)
+        config.repoLabels = [...existingLabels]
+
+        yamlContent = YAML.stringify(config)
+        yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1')
+        yamlContent = yamlContent.replace(/dryRun:(.*)/g, 'dryRun:$1\n')
+        yamlContent = yamlContent.replace('repoLabels:\n', '\nrepoLabels:')
+        yamlContent = yamlContent.replace(/commitMessage:(.*)/g, '\ncommitMessage:$1')
+    }
+
+    if (config.dryRun) {
+        core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
+        core.info(yamlContent)
+        return
+    }
+
+    const { data } = await octokit.repos.getContent({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        path: configPath
+    })
+
+    if (Array.isArray(data)) { return }
+
+    const response = await octokit.repos.createOrUpdateFileContents({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        path: configPath,
+        message: config.commitMessage,
+        content: Buffer.from(yamlContent).toString('base64'),
+        sha: data.sha
+    })
+
+    if (response.status === 200) {
+        core.info(`Your changes have been synced to ${configPath}`)
+    } else {
+        core.warning(`Something went wrong! [response-code: ${response.status.toString()}]`)
+    }
+}
+
+//  When run, syncs labels from ./github/labels.yaml to the repository
+const syncRepoLabels = async () => {
 
     //  GET EXISTING LABELS
     //  ===================
@@ -54,7 +103,7 @@ const runAction = async () => {
     core.info('\nCREATE LABELS')
     createLabels.forEach(async (labelName) => {
         const label = configLabelsMap.get(labelName)
-        if (!label) { return }
+        if (!label || !config.create) { return }
         core.info(writeLabelMessage('CREATE', label))
         if (config.dryRun) { return }
         
@@ -74,7 +123,7 @@ const runAction = async () => {
     core.info('\nUPDATE LABELS')
     updateLabels.forEach(async (labelName) => {
         const label = configLabelsMap.get(labelName)
-        if (!label) { return }
+        if (!label || !config.update) { return }
         core.info(writeLabelMessage('UPDATE', label))
         if (config.dryRun) { return }
         
@@ -94,7 +143,7 @@ const runAction = async () => {
     core.info('\nDELETE LABELS')
     deleteLabels.forEach(async (labelName) => {
         const label = existingLabelsMap.get(labelName)
-        if (!label) { return }
+        if (!label || !config.delete) { return }
         core.info(writeLabelMessage('DELETE', label))
         if (config.dryRun) { return }
         
@@ -112,5 +161,15 @@ const runAction = async () => {
 //  ==============
 
 //  Try running GitHub Action and catch errors if any
-try { runAction() }
-catch(err) { core.setFailed(err.message) }
+try {
+    if (github.context.eventName === 'label') {
+        core.info('Syncing your changes with ./github/labels.yaml')
+        syncYamlLabels()
+    } else {    //TODO:  Use better else clause
+        core.info('Syncing labels from ./github/labels.yaml to your repository')
+        syncRepoLabels()
+    }
+} catch(err) {
+    core.error(err.message)
+    core.setFailed(err.message)
+}

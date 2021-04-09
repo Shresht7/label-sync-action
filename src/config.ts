@@ -1,27 +1,35 @@
 import * as fs from 'fs'
-import * as path from 'path'
 import * as YAML from 'yaml'
 
-import { ConfigYAML, core } from "./typedefs"
+import { ConfigYAML, core } from './typedefs'
 
 //  ================
 //  READ CONFIG YAML
 //  ================
 
-export const readYAML = (core: core): ConfigYAML => {
-    //  Get Workspace URL
-    const workspaceURL = process.env.GITHUB_WORKSPACE || ''
-    if (!workspaceURL) { core.setFailed('Failed to read GitHub workspace URL') }
-
-    //  Read Labels from ./.github/labels.yaml
+//  Reads and parses ./github/labels.yaml
+export const readConfigYAML = (pathURL: string, core: core): [ConfigYAML, boolean] => {
     let file
-    const targetDir = path.join('.github', 'labels.yaml')
-    const url = path.join(workspaceURL, '.github', 'labels.yaml')
-    try { file = fs.readFileSync(url, 'utf8') }
-    catch(err) { core.warning(`Could not read ${targetDir}. Assuming empty file`); file = '' }    //  If readFileSync fails, assume empty yaml
+    let firstRun = false
+
+    try {
+        file = fs.readFileSync(pathURL, 'utf8')
+    } catch(err) {
+        core.warning(`Could not read ${pathURL}. Assuming empty file`)
+        file = ''   //  If readFile fails, assume empty yaml
+        firstRun = true
+    }
     
-    const yaml: ConfigYAML = YAML.parse(file)
-    if (!yaml) { core.setFailed(`Failed to read ${targetDir}`) }
+    //  Parse file
+    const config: ConfigYAML = YAML.parse(file)
     
-    return yaml
+    //  Set defaults
+    config.dryRun = config?.dryRun ?? false
+    config.create = config?.create ?? true
+    config.update = config?.update ?? true
+    config.delete = config?.delete ?? false
+    config.repoLabels = config?.repoLabels ?? []
+    config.commitMessage = config?.commitMessage || 'Update Repo-Labels'
+
+    return [config, firstRun]
 }

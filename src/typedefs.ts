@@ -11,18 +11,18 @@ export type github = typeof import("@actions/github")
 export type core = typeof import("@actions/core")
 
 export interface GitHubLabel {
-    id: number
-    node_id: string
-    url: string
     name: string
     description: string | null
     color: string
-    default: boolean
 }
 
 export interface ConfigYAML {
     dryRun?: boolean
+    create?: boolean
+    update?: boolean
+    delete?: boolean
     repoLabels: GitHubLabel[]
+    commitMessage: string
 }
 
 export type LabelsMap = Map<string, GitHubLabel>
