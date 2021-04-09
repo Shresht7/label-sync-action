@@ -32,10 +32,6 @@ repoLabels:
     color: d876e3
     description: Further information is requested
 
-  - name: test
-    color: c5def5
-    description: ""
-
   - name: wontfix
     color: ffffff
     description: This will not be worked on
