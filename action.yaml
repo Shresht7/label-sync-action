@@ -1,5 +1,52 @@
-name: "Repo-Labels"
-description: "Creates, updates and deletes labels from your repositories"
+# =========
+# SynLabels
+# =========
+
+name: SynLabels
+author: Shresht7
+description: Create, update, and delete labels from your repository declaratively
+
+branding:
+  icon: tag
+  color: white
+
+# Inputs
+# ======
+
+inputs:
+
+  # Dry Run Toggle
+  # --------------
+
+  dryrun:
+    description: "Dry Run toggle. SynLabels will not make any actual changes if true (default: true)"
+    default: true
+
+  # Commit Message
+  # --------------
+
+  commitmessage:
+    description: "Commit Message. Shown when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)"
+    required: true
+    default: SynLabels Update
+
+  # Permissions
+  # -----------
+
+  create:
+    description: "If true, SynLabels has permission to create labels (default: true)"
+    default: true
+
+  update:
+    description: "If true, SynLabels has permission to update labels (default: true)"
+    default: true
+
+  delete:
+    description: "If true, SynLabels has permission to delete labels (default: false)"
+    default: false
+
+# Run
+# ===
 
 runs:
   using: "node12"

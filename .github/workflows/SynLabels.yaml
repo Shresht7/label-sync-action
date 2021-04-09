@@ -1,0 +1,46 @@
+name: SynLabels
+
+# Activation Events
+# =================
+
+# When .github/labels.yaml changes are pushed
+on:
+  push:
+    paths:
+      - .github/labels.yaml
+  label:  # When a label webhook event (create, update, delete) is triggered
+  workflow_dispatch:  # When a workflow event is dispatched manually
+
+# Jobs
+# ====
+
+jobs:
+  SynLabels:
+    runs-on: ubuntu-latest
+    
+    name: SynLabels
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: SynLabels
+        uses: ./ # Uses an action in the root directory
+        id: SynLabels
+
+        # Config Parameters
+        # -----------------
+
+        with:
+          dryrun: false # Will not make any actual changes if true (default: true)
+          commitmessage: SynLabels Update # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)
+          create: true  # if true, SynLabels has permissions to create labels (default: true)
+          update: true  # if true, SynLabels has permissions to update labels (default: true)
+          delete: true  # if true, SynLabels has permissions to delete labels (default: false)
+
+        # Environment Variables
+        # ---------------------
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file

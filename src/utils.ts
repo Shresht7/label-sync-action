@@ -1,43 +1,53 @@
-import { octokit, github, GitHubLabel, ConfigYAML, LabelsMap } from './typedefs'
+import * as fs from 'fs'    //  File-System Module
+import * as core from '@actions/core'   //  GitHub Actions toolkit core
+import * as YAML from 'yaml'    //  YAML parser
+
+import { octokit, github, GitHubLabel, Config, LabelsMap } from './typedefs'    //  Type definitions
 
 //  ==========
 //  GET LABELS
 //  ==========
 
+//  Read Labels from the .github/labels.yaml file and returns a LabelsMap
+export const getSynLabels = (config: Config): LabelsMap => {
+    //  Read file from directory
+    let file = ''
+    try {
+        file = fs.readFileSync(config.pathURL, 'utf8')
+    } catch(err) {
+        core.warning(`Could not read ${config.pathURL}. Assuming empty file`)
+        config.firstRun = true
+    }
+
+    //  Create synLabelsMap
+    const synLabelsMap = new Map()
+    const { repoLabels: synLabels } : { repoLabels: GitHubLabel[] } = YAML.parse(file)
+    synLabels?.forEach(label => synLabelsMap.set(label.name, label))
+
+    return synLabelsMap
+}
+
 //  Gets all labels in current repository
-export const getLabels = async (octokit: octokit, github: github): Promise<GitHubLabel[]> => {
+export const getRepoLabels = async (octokit: octokit, github: github): Promise<LabelsMap> => {
     //  Fetch Labels for current repo
     const { data } = await octokit.issues.listLabelsForRepo({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo
     })
 
-    //  Returns a sub-set of data
-    const labels = data.map(label => ({
+    //  Returns a sub-set of the response data
+    const repoLabels = data.map(label => ({
             name: label.name,
             color: label.color,
             description: label.description
         })
     )
 
-    return labels
-}
+    //  Create repoLabelsMap
+    const repoLabelsMap: LabelsMap = new Map()
+    repoLabels.forEach(label => repoLabelsMap.set(label.name, label))
 
-//  ===========
-//  READ LABELS
-//  ===========
-
-//  Reads labels from .github/labels.yaml
-export const readLabels = (config: ConfigYAML) => {
-    let labels: GitHubLabel[] = config.repoLabels
-
-    //  Remaps labels array after removing # from colors (if any)
-    labels = labels.map(label => ({
-        ...label,
-        color: label.color[0] === '#' ? label.color.substr(1) : label.color
-    }))
-
-    return labels
+    return repoLabelsMap
 }
 
 //  ===========
@@ -100,5 +110,5 @@ export const writeLabelMessage = (mode: 'CREATE'|'UPDATE'|'DELETE', label: GitHu
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`
     }
 
-    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`
+    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} ${label.description}`
 }

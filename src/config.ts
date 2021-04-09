@@ -1,35 +1,33 @@
-import * as fs from 'fs'
-import * as YAML from 'yaml'
+import * as path from 'path'    //  Path module
+import * as core from '@actions/core'   //  GitHub Action toolkit core
 
-import { ConfigYAML, core } from './typedefs'
+import { Config } from './typedefs' //  Type definitions
 
-//  ================
-//  READ CONFIG YAML
-//  ================
+//  =============
+//  CONFIG INPUTS
+//  =============
 
-//  Reads and parses ./github/labels.yaml
-export const readConfigYAML = (pathURL: string, core: core): [ConfigYAML, boolean] => {
-    let file
-    let firstRun = false
+const workspaceURL = process.env.GITHUB_WORKSPACE || ''
+let fileName = 'labels.yaml'    //  .github/labels.yaml
+const filePath = path.join('.github', fileName)
 
-    try {
-        file = fs.readFileSync(pathURL, 'utf8')
-    } catch(err) {
-        core.warning(`Could not read ${pathURL}. Assuming empty file`)
-        file = ''   //  If readFile fails, assume empty yaml
-        firstRun = true
-    }
-    
-    //  Parse file
-    const config: ConfigYAML = YAML.parse(file)
-    
-    //  Set defaults
-    config.dryRun = config?.dryRun ?? false
-    config.create = config?.create ?? true
-    config.update = config?.update ?? true
-    config.delete = config?.delete ?? false
-    config.repoLabels = config?.repoLabels ?? []
-    config.commitMessage = config?.commitMessage || 'Update Repo-Labels'
+//  Converts core.getInput() -> string to a boolean
+const convertStrToBoolean = (str: string): boolean => str.toLowerCase() === 'true'
 
-    return [config, firstRun]
+const config: Config = {
+    fileName,
+    commitMessage: core.getInput('commitmessage', { required: true }),
+    dryRun: convertStrToBoolean(core.getInput('dryrun')) ?? false,
+    path: filePath,
+    pathURL: path.join(workspaceURL, filePath),
+    permission: {
+        create: convertStrToBoolean(core.getInput('create')),
+        update: convertStrToBoolean(core.getInput('update')),
+        delete: convertStrToBoolean(core.getInput('delete'))
+    },
+    firstRun: false
 }
+
+//  =================
+export default config
+//  =================

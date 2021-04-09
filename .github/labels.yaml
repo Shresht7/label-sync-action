@@ -1,10 +1,5 @@
-dryRun: true
-
-create: true
-update: true
-delete: false
-
 repoLabels:
+
   - name: bug
     color: ee1111
     description: Something isn't working
@@ -40,5 +35,3 @@ repoLabels:
   - name: wontfix
     color: ffffff
     description: This will not be worked on
-
-commitMessage: Update Repo-Labels

@@ -25,43 +25,200 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readConfigYAML = void 0;
-const fs = __importStar(__nccwpck_require__(5747));
-const YAML = __importStar(__nccwpck_require__(9967));
-//  ================
-//  READ CONFIG YAML
-//  ================
-//  Reads and parses ./github/labels.yaml
-const readConfigYAML = (pathURL, core) => {
-    var _a, _b, _c, _d, _e;
-    let file;
-    let firstRun = false;
-    try {
-        file = fs.readFileSync(pathURL, 'utf8');
-    }
-    catch (err) {
-        core.warning(`Could not read ${pathURL}. Assuming empty file`);
-        file = ''; //  If readFile fails, assume empty yaml
-        firstRun = true;
-    }
-    //  Parse file
-    const config = YAML.parse(file);
-    //  Set defaults
-    config.dryRun = (_a = config === null || config === void 0 ? void 0 : config.dryRun) !== null && _a !== void 0 ? _a : false;
-    config.create = (_b = config === null || config === void 0 ? void 0 : config.create) !== null && _b !== void 0 ? _b : true;
-    config.update = (_c = config === null || config === void 0 ? void 0 : config.update) !== null && _c !== void 0 ? _c : true;
-    config.delete = (_d = config === null || config === void 0 ? void 0 : config.delete) !== null && _d !== void 0 ? _d : false;
-    config.repoLabels = (_e = config === null || config === void 0 ? void 0 : config.repoLabels) !== null && _e !== void 0 ? _e : [];
-    config.commitMessage = (config === null || config === void 0 ? void 0 : config.commitMessage) || 'Update Repo-Labels';
-    return [config, firstRun];
+const path = __importStar(__nccwpck_require__(5622)); //  Path module
+const core = __importStar(__nccwpck_require__(115)); //  GitHub Action toolkit core
+//  =============
+//  CONFIG INPUTS
+//  =============
+const workspaceURL = process.env.GITHUB_WORKSPACE || '';
+let fileName = 'labels.yaml'; //  .github/labels.yaml
+const filePath = path.join('.github', fileName);
+//  Converts core.getInput() -> string to a boolean
+const convertStrToBoolean = (str) => str.toLowerCase() === 'true';
+const config = {
+    fileName,
+    commitMessage: core.getInput('commitmessage', { required: true }),
+    dryRun: (_a = convertStrToBoolean(core.getInput('dryrun'))) !== null && _a !== void 0 ? _a : false,
+    path: filePath,
+    pathURL: path.join(workspaceURL, filePath),
+    permission: {
+        create: convertStrToBoolean(core.getInput('create')),
+        update: convertStrToBoolean(core.getInput('update')),
+        delete: convertStrToBoolean(core.getInput('delete'))
+    },
+    firstRun: false
 };
-exports.readConfigYAML = readConfigYAML;
+//  =================
+exports.default = config;
+//  =================
 
 
 /***/ }),
 
 /***/ 6711:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(115));
+const github = __importStar(__nccwpck_require__(3007));
+const config_1 = __importDefault(__nccwpck_require__(6179));
+const syncRepoLabels_1 = __importDefault(__nccwpck_require__(2845));
+const syncSynLabels_1 = __importDefault(__nccwpck_require__(3718));
+//  =======
+//  OCTOKIT
+//  =======
+const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN || '';
+!GITHUB_ACCESS_TOKEN && core.setFailed(`Invalid GITHUB_ACCESS_TOKEN`);
+const octokit = github.getOctokit(GITHUB_ACCESS_TOKEN);
+//  =====================
+//  EXECUTE GITHUB ACTION
+//  =====================
+if (github.context.eventName === 'label') { //  If action was triggered by the label webhook event (when user changes the labels manually)
+    core.info('Syncing your changes with ./github/labels.yaml');
+    //  Sync user's changes to .github/labels.yaml file
+    syncSynLabels_1.default(config_1.default, core, octokit, github)
+        .then(() => core.info(`Your changes have been synced to ${config_1.default.path}`))
+        .catch((err) => core.setFailed(err.message));
+}
+else { //  If the action was triggered on push or manually by workflow_dispatch //TODO:  Use better else clause if possible
+    core.info('Syncing labels from ./github/labels.yaml to your repository');
+    //  Sync label-data from .github/labels.yaml to this repository
+    syncRepoLabels_1.default(config_1.default, core, octokit, github)
+        .then(() => core.info(`Successfully synced label-data from ${config_1.default.path} to this repository`))
+        .catch((err) => core.setFailed(err.message));
+}
+
+
+/***/ }),
+
+/***/ 2845:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const utils_1 = __nccwpck_require__(3072); //  Utility functions
+//  ================
+//  SYNC REPO LABELS
+//  ================
+//  When run, syncs labels from ./github/labels.yaml to the repository
+const syncRepoLabels = (config, core, octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
+    const synLabelsMap = utils_1.getSynLabels(config); //  Get label-data from SynLabels file (.github/labels.yaml)
+    const repoLabelsMap = yield utils_1.getRepoLabels(octokit, github); //  Get label-data from the repository
+    //  Sort labels into actionable categories
+    const [createLabels, updateLabels, deleteLabels] = utils_1.labelSorter(repoLabelsMap, synLabelsMap);
+    //  Print Dry-Run notice
+    if (config.dryRun) {
+        core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
+    }
+    //  CREATE LABELS
+    //  =============
+    if (config.permission.create && createLabels.length > 0) {
+        core.info('\nCREATE LABELS');
+        createLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
+            const label = synLabelsMap.get(labelName); //  Get label from LabelMap
+            if (!label) {
+                return;
+            } //  If label is undefined then exit
+            core.info(utils_1.writeLabelMessage('CREATE', label));
+            if (config.dryRun) {
+                return;
+            } //  If Dry-Run then exit
+            yield octokit.issues.createLabel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                name: label.name,
+                color: label.color || '000000',
+                description: label.description || ''
+            });
+        }));
+    }
+    //  UPDATE LABELS
+    //  =============
+    if (config.permission.update && updateLabels.length > 0) {
+        core.info('\nUPDATE LABELS');
+        updateLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
+            const label = synLabelsMap.get(labelName); //  Get label from LabelMap
+            if (!label) {
+                return;
+            } //  If label is undefined then exit
+            core.info(utils_1.writeLabelMessage('UPDATE', label));
+            if (config.dryRun) {
+                return;
+            } //  If Dry-Run then exit
+            yield octokit.issues.updateLabel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                name: label.name,
+                color: label.color || '000000',
+                description: label.description || ''
+            });
+        }));
+    }
+    //  DELETE LABELS
+    //  =============
+    if (config.permission.delete && deleteLabels.length > 0) {
+        core.info('\nDELETE LABELS');
+        deleteLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
+            const label = repoLabelsMap.get(labelName); //  Get label from LabelMap
+            if (!label) {
+                return;
+            } //  If label is undefined then exit
+            core.info(utils_1.writeLabelMessage('DELETE', label));
+            if (config.dryRun) {
+                return;
+            } //  If Dry-Run then exit
+            yield octokit.issues.deleteLabel({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                name: label.name
+            });
+        }));
+    }
+});
+//  =========================
+exports.default = syncRepoLabels;
+//  =========================
+
+
+/***/ }),
+
+/***/ 3718:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -95,194 +252,95 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const path = __importStar(__nccwpck_require__(5622));
-const YAML = __importStar(__nccwpck_require__(9967));
-const core = __importStar(__nccwpck_require__(115));
-const github = __importStar(__nccwpck_require__(3007));
-const config_1 = __nccwpck_require__(6179);
-const utils_1 = __nccwpck_require__(3072);
-//  ======
-//  CONFIG
-//  ======
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_TOKEN || '';
-if (!GITHUB_ACCESS_TOKEN) {
-    core.setFailed(`Invalid GITHUB_ACCESS_TOKEN`);
-}
-const octokit = github.getOctokit(GITHUB_ACCESS_TOKEN);
-const workspaceURL = process.env.GITHUB_WORKSPACE || '';
-const configPath = path.join('.github', 'labels.yaml') || '';
-const configPathURL = path.join(workspaceURL, configPath) || '';
-const [config, firstRun] = config_1.readConfigYAML(configPathURL, core);
-//  =================
-//  RUN GITHUB ACTION
-//  =================
+const YAML = __importStar(__nccwpck_require__(9967)); //  YAML parser
+const utils_1 = __nccwpck_require__(3072); //  Get's repository label-data
+//  ==============
+//  SYNC SYNLABELS
+//  ==============
 //  Responds to user editing repo-labels and syncs changes to .github/labels.yaml
-const syncYamlLabels = () => __awaiter(void 0, void 0, void 0, function* () {
+const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
+    const repoLabelsMap = yield utils_1.getRepoLabels(octokit, github); //  Get repo's label-data
     let yamlContent = '';
-    if (!firstRun) {
-        const configLabelNames = utils_1.readLabels(config).map(label => label.name);
+    if (!config.firstRun) {
         let { payload: { action, label } } = github.context;
-        label = label.map((x) => {
-            x.name,
-                x.color,
-                x.description;
-        });
-        if (action === 'created' && !configLabelNames.includes(label.name)) {
-            config.repoLabels = [...config.repoLabels, label];
+        //  Only keep properties that are needed
+        label = {
+            name: label.name,
+            description: label.description,
+            color: label.color
+        };
+        if (action === 'created' && !repoLabelsMap.has(label.name)) { //  New Label Created
+            repoLabelsMap.set(label.name, label);
         }
-        else if (action === 'updated' && configLabelNames.includes(label.name)) {
-            const index = config.repoLabels.findIndex(x => x.name === label.name);
-            config.repoLabels[index] = label;
+        else if (action === 'updated' && repoLabelsMap.has(label.name)) { //  Existing Label Updated
+            repoLabelsMap.set(label.name, label);
         }
-        else if (action === 'deleted' && configLabelNames.includes(label.name)) {
-            const index = config.repoLabels.findIndex(x => x.name === label.name);
-            delete config.repoLabels[index];
+        else if (action === 'deleted' && repoLabelsMap.has(label.name)) { //  Existing Label Deleted
+            repoLabelsMap.delete(label.name);
         }
     }
-    else {
-        const existingLabels = yield utils_1.getLabels(octokit, github);
-        config.repoLabels = [...existingLabels];
-    }
-    yamlContent = YAML.stringify(config);
-    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1');
-    yamlContent = yamlContent.replace(/dryRun:(.*)/g, 'dryRun:$1\n');
-    yamlContent = yamlContent.replace('repoLabels:\n', '\nrepoLabels:');
-    yamlContent = yamlContent.replace(/commitMessage:(.*)/g, '\ncommitMessage:$1');
+    //  Create array
+    let repoLabels = [];
+    repoLabelsMap.forEach(label => repoLabels.push(label));
+    //  YAMLify repoLabels
+    yamlContent = YAML.stringify({ repoLabels });
+    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1'); //  Add additional \n for clarity sake
+    //  Log and exit if Dry-Run Mode
     if (config.dryRun) {
         core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
         core.info(yamlContent);
         return;
     }
+    //  Get .github/labels.yaml file (if it exists). For SHA
     const { data } = yield octokit.repos.getContent({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        path: configPath
+        path: config.path
     });
     if (Array.isArray(data)) {
         return;
-    }
-    const response = yield octokit.repos.createOrUpdateFileContents({
+    } //  If the response is not for a single file then exit
+    //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
+    yield octokit.repos.createOrUpdateFileContents({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        path: configPath,
+        path: config.path,
         message: config.commitMessage,
         content: Buffer.from(yamlContent).toString('base64'),
         sha: data.sha
     });
-    if (response.status === 200) {
-        core.info(`Your changes have been synced to ${configPath}`);
-    }
-    else {
-        core.warning(`Something went wrong! [response-code: ${response.status.toString()}]`);
-    }
 });
-//  When run, syncs labels from ./github/labels.yaml to the repository
-const syncRepoLabels = () => __awaiter(void 0, void 0, void 0, function* () {
-    //  GET EXISTING LABELS
-    //  ===================
-    const existingLabelsMap = new Map();
-    const existingLabels = yield utils_1.getLabels(octokit, github);
-    existingLabels.forEach(label => existingLabelsMap.set(label.name, label));
-    //  GET CONFIG LABELS
-    //  =================
-    const configLabelsMap = new Map();
-    const configLabels = utils_1.readLabels(config);
-    configLabels.forEach(label => configLabelsMap.set(label.name, label));
-    //  SORT LABELS INTO ACTIONABLE CATEGORIES
-    const [createLabels, updateLabels, deleteLabels] = utils_1.labelSorter(existingLabelsMap, configLabelsMap);
-    //  Dry Run Message
-    if (config.dryRun) {
-        core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
-    }
-    //  CREATE LABELS
-    //  =============
-    core.info('\nCREATE LABELS');
-    createLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
-        const label = configLabelsMap.get(labelName);
-        if (!label || !config.create) {
-            return;
-        }
-        core.info(utils_1.writeLabelMessage('CREATE', label));
-        if (config.dryRun) {
-            return;
-        }
-        //  REAL STUFF HERE
-        yield octokit.issues.createLabel({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            name: label.name,
-            color: label.color || '000000',
-            description: label.description || ''
-        });
-    }));
-    //  UPDATE LABELS
-    //  =============
-    core.info('\nUPDATE LABELS');
-    updateLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
-        const label = configLabelsMap.get(labelName);
-        if (!label || !config.update) {
-            return;
-        }
-        core.info(utils_1.writeLabelMessage('UPDATE', label));
-        if (config.dryRun) {
-            return;
-        }
-        //  REAL STUFF HERE
-        yield octokit.issues.updateLabel({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            name: label.name,
-            color: label.color || '000000',
-            description: label.description || ''
-        });
-    }));
-    //  DELETE LABELS
-    //  =============
-    core.info('\nDELETE LABELS');
-    deleteLabels.forEach((labelName) => __awaiter(void 0, void 0, void 0, function* () {
-        const label = existingLabelsMap.get(labelName);
-        if (!label || !config.delete) {
-            return;
-        }
-        core.info(utils_1.writeLabelMessage('DELETE', label));
-        if (config.dryRun) {
-            return;
-        }
-        //  REAL STUFF HERE
-        yield octokit.issues.deleteLabel({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            name: label.name
-        });
-    }));
-});
-//  ==============
-//  EXECUTE ACTION
-//  ==============
-//  Try running GitHub Action and catch errors if any
-try {
-    if (github.context.eventName === 'label') {
-        core.info('Syncing your changes with ./github/labels.yaml');
-        syncYamlLabels();
-    }
-    else { //TODO:  Use better else clause
-        core.info('Syncing labels from ./github/labels.yaml to your repository');
-        syncRepoLabels();
-    }
-}
-catch (err) {
-    core.error(err.message);
-    core.setFailed(err.message);
-}
+//  ========================
+exports.default = syncSynLabels;
+//  ========================
 
 
 /***/ }),
 
 /***/ 3072:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -293,37 +351,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.writeLabelMessage = exports.labelSorter = exports.readLabels = exports.getLabels = void 0;
+exports.writeLabelMessage = exports.labelSorter = exports.getRepoLabels = exports.getSynLabels = void 0;
+const fs = __importStar(__nccwpck_require__(5747)); //  File-System Module
+const core = __importStar(__nccwpck_require__(115)); //  GitHub Actions toolkit core
+const YAML = __importStar(__nccwpck_require__(9967)); //  YAML parser
 //  ==========
 //  GET LABELS
 //  ==========
+//  Read Labels from the .github/labels.yaml file and returns a LabelsMap
+const getSynLabels = (config) => {
+    //  Read file from directory
+    let file = '';
+    try {
+        file = fs.readFileSync(config.pathURL, 'utf8');
+    }
+    catch (err) {
+        core.warning(`Could not read ${config.pathURL}. Assuming empty file`);
+        config.firstRun = true;
+    }
+    //  Create synLabelsMap
+    const synLabelsMap = new Map();
+    const { repoLabels: synLabels } = YAML.parse(file);
+    synLabels === null || synLabels === void 0 ? void 0 : synLabels.forEach(label => synLabelsMap.set(label.name, label));
+    return synLabelsMap;
+};
+exports.getSynLabels = getSynLabels;
 //  Gets all labels in current repository
-const getLabels = (octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
+const getRepoLabels = (octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
     //  Fetch Labels for current repo
     const { data } = yield octokit.issues.listLabelsForRepo({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo
     });
-    //  Returns a sub-set of data
-    const labels = data.map(label => ({
+    //  Returns a sub-set of the response data
+    const repoLabels = data.map(label => ({
         name: label.name,
         color: label.color,
         description: label.description
     }));
-    return labels;
+    //  Create repoLabelsMap
+    const repoLabelsMap = new Map();
+    repoLabels.forEach(label => repoLabelsMap.set(label.name, label));
+    return repoLabelsMap;
 });
-exports.getLabels = getLabels;
-//  ===========
-//  READ LABELS
-//  ===========
-//  Reads labels from .github/labels.yaml
-const readLabels = (config) => {
-    let labels = config.repoLabels;
-    //  Remaps labels array after removing # from colors (if any)
-    labels = labels.map(label => (Object.assign(Object.assign({}, label), { color: label.color[0] === '#' ? label.color.substr(1) : label.color })));
-    return labels;
-};
-exports.readLabels = readLabels;
+exports.getRepoLabels = getRepoLabels;
 //  ===========
 //  SORT LABELS
 //  ===========
@@ -374,7 +445,7 @@ const writeLabelMessage = (mode, label) => {
         const b = parseInt(hex.substring(4, 6), 16);
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`;
     };
-    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} (${label.description})`;
+    return `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}${colorMap.RESET} ${colorString(label.name, label.color)} ${label.description}`;
 };
 exports.writeLabelMessage = writeLabelMessage;
 
