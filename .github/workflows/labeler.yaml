@@ -1,4 +1,10 @@
-on: [label, workflow_dispatch]
+on:
+  push:
+    paths:
+      - .github/labels.yaml
+
+  label
+  workflow_dispatch
 
 jobs:
   labeler:
