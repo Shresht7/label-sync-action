@@ -8,7 +8,7 @@ import * as github from '@actions/github'
 import { readConfigYAML as readConfig } from './config'
 import { getLabels, labelSorter, readLabels, writeLabelMessage } from './utils'
 
-import {  LabelsMap } from './typedefs'
+import {  GitHubLabel, LabelsMap } from './typedefs'
 
 //  ======
 //  CONFIG
@@ -31,18 +31,34 @@ const [config, firstRun] = readConfig(configPathURL, core)
 const syncYamlLabels = async () => {
     let yamlContent = ''
     if (!firstRun) {
-        const configLabels = readLabels(config)
-        const { eventName, payload: { action, label } } = github.context
+        const configLabelNames = readLabels(config).map(label => label.name)
+        let { payload: { action, label } } = github.context
+
+        label = label.map((x: GitHubLabel) => {
+            x.name,
+            x.color,
+            x.description
+        })
+
+        if (action === 'created' && !configLabelNames.includes(label.name)) {
+            config.repoLabels = [ ...config.repoLabels, label ]
+        } else if (action === 'updated' && configLabelNames.includes(label.name)) {
+            const index = config.repoLabels.findIndex(x => x.name === label.name)
+            config.repoLabels[index] = label
+        } else if (action === 'deleted'&& configLabelNames.includes(label.name)) {
+            const index = config.repoLabels.findIndex(x => x.name === label.name)
+            delete config.repoLabels[index]
+        }
     } else {
         const existingLabels = await getLabels(octokit, github)
         config.repoLabels = [...existingLabels]
-
-        yamlContent = YAML.stringify(config)
-        yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1')
-        yamlContent = yamlContent.replace(/dryRun:(.*)/g, 'dryRun:$1\n')
-        yamlContent = yamlContent.replace('repoLabels:\n', '\nrepoLabels:')
-        yamlContent = yamlContent.replace(/commitMessage:(.*)/g, '\ncommitMessage:$1')
     }
+
+    yamlContent = YAML.stringify(config)
+    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1')
+    yamlContent = yamlContent.replace(/dryRun:(.*)/g, 'dryRun:$1\n')
+    yamlContent = yamlContent.replace('repoLabels:\n', '\nrepoLabels:')
+    yamlContent = yamlContent.replace(/commitMessage:(.*)/g, '\ncommitMessage:$1')
 
     if (config.dryRun) {
         core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
