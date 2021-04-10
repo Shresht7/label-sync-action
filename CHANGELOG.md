@@ -1,5 +1,5 @@
 # SynLabels Changelog
 
-## [v1.0.0] --- 8th April 2021 --- Initialization
+## [v1.0.0] --- 10th April 2021 --- Initial Release
 
-- Initial Commit
+- Initial Release

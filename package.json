@@ -1,7 +1,7 @@
 {
   "name": "syn-labels",
   "version": "1.0.0",
-  "description": "Create, update, delete labels from your repositories declaratively",
+  "description": "Manage your repository labels using a config file. Create, update and delete labels declaratively by editing the config. Share this config with other repos to keep their labels in sync!",
   "main": "dist/index.js",
   "scripts": {
     "tsc": "tsc",
