@@ -107,3 +107,6 @@ build
 
 # TernJS port file
 .tern-port
+
+# Code-Workspace
+*.code-workspace
