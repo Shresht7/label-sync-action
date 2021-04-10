@@ -14,7 +14,6 @@ If the config file (`.github/labels.yaml`) does not exist when the action execut
 ### Workflow setup
 
 Create a workflow file `.github/workflows/Synlabels.yaml` and configure the input parameters.
-DryRun is enabled by default. Potential changes will only be logged. For SynLabels to actually modify anything you will have to set `dryrun` to `false`.
 
 ```yaml
 name: SynLabels
@@ -69,6 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
 ```
+NOTE: Potential changes will only be logged if dry run is `true`. For SynLabels to actually modify anything you will have to set `dryrun` to `false`.
 
 ### Example Config
 
