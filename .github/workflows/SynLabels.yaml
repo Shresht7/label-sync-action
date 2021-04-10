@@ -39,7 +39,7 @@ jobs:
 
         with:
           commitmessage: SynLabels Update # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)
-          dryrun: false   # Will not make any actual changes if true (default: true)
+          dryrun: true    # Will not make any actual changes if true (default: true)
           create: true    # If true, SynLabels has permissions to create labels (default: true)
           update: true    # If true, SynLabels has permissions to update labels (default: true)
           delete: false   # If true, SynLabels has permissions to delete labels (default: false)
