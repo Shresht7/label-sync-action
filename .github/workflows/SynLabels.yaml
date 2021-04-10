@@ -19,6 +19,13 @@ jobs:
     
     name: SynLabels
     steps:
+    
+      # Actions/Checkout
+      # ================
+
+      # Required for GITHUB_WORKSPACE
+      - name: Checkout
+        uses: actions/checkout@v2
 
       # Execute SynLabels Action
       # ========================

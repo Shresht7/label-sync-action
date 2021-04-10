@@ -1,4 +1,5 @@
 import * as fs from 'fs'    //  File-System Module
+import * as core from '@actions/core'   //  Github Actions toolkit
 import * as YAML from 'yaml'    //  YAML parser
 
 import { octokit, github, GitHubLabel, Config, LabelsMap } from './typedefs'    //  Type definitions
@@ -13,7 +14,7 @@ export const readYAMLFile = (path: string): { file: string, firstRun: boolean } 
     let firstRun = false
 
     try {
-        file = fs.readFileSync(path, 'utf-8')
+        file = fs.readFileSync(path, 'utf8')
     } catch(err) {
         firstRun = true
     }

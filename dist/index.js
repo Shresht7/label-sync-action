@@ -367,7 +367,7 @@ const readYAMLFile = (path) => {
     let file = '';
     let firstRun = false;
     try {
-        file = fs.readFileSync(path, 'utf-8');
+        file = fs.readFileSync(path, 'utf8');
     }
     catch (err) {
         firstRun = true;
