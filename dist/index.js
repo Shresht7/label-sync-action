@@ -35,6 +35,7 @@ const core = __importStar(__nccwpck_require__(115)); //  GitHub Action toolkit c
 const workspaceURL = process.env.GITHUB_WORKSPACE || '';
 let fileName = 'labels.yaml'; //  .github/labels.yaml
 const filePath = path.join('.github', fileName);
+console.log(workspaceURL, filePath);
 //  Converts core.getInput() -> string to a boolean
 const convertStrToBoolean = (str) => str.toLowerCase() === 'true';
 const config = {
