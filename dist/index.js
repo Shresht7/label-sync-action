@@ -47,8 +47,7 @@ const config = {
         create: convertStrToBoolean(core.getInput('create')),
         update: convertStrToBoolean(core.getInput('update')),
         delete: convertStrToBoolean(core.getInput('delete'))
-    },
-    firstRun: false
+    }
 };
 //  =================
 exports.default = config;
@@ -261,7 +260,8 @@ const utils_1 = __nccwpck_require__(3072); //  Get's repository label-data
 const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 0, void 0, function* () {
     const repoLabelsMap = yield utils_1.getRepoLabels(octokit, github); //  Get repo's label-data
     let yamlContent = '';
-    if (!config.firstRun) {
+    const { firstRun } = utils_1.readYAMLFile(config.pathURL);
+    if (!firstRun) {
         let { payload: { action, label } } = github.context;
         //  Only keep properties that are needed
         label = {
@@ -293,7 +293,7 @@ const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 
     }
     //  Get .github/labels.yaml file (if it exists). For SHA
     let SHA;
-    if (!config.firstRun) {
+    if (!firstRun) {
         const { data } = yield octokit.repos.getContent({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
@@ -355,24 +355,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.writeLabelMessage = exports.labelSorter = exports.getRepoLabels = exports.getSynLabels = void 0;
+exports.writeLabelMessage = exports.labelSorter = exports.getRepoLabels = exports.getSynLabels = exports.readYAMLFile = void 0;
 const fs = __importStar(__nccwpck_require__(5747)); //  File-System Module
-const core = __importStar(__nccwpck_require__(115)); //  GitHub Actions toolkit core
 const YAML = __importStar(__nccwpck_require__(9967)); //  YAML parser
 //  ==========
 //  GET LABELS
 //  ==========
+//  Read file from path
+const readYAMLFile = (path) => {
+    let file = '';
+    let firstRun = false;
+    try {
+        file = fs.readFileSync(path, 'utf-8');
+    }
+    catch (err) {
+        firstRun = true;
+    }
+    return { file, firstRun };
+};
+exports.readYAMLFile = readYAMLFile;
 //  Read Labels from the .github/labels.yaml file and returns a LabelsMap
 const getSynLabels = (config) => {
     //  Read file from directory
-    let file = '';
-    try {
-        file = fs.readFileSync(config.pathURL, 'utf8');
-    }
-    catch (err) {
-        core.warning(`Could not read ${config.pathURL}. Assuming empty file`);
-        config.firstRun = true;
-    }
+    const { file } = exports.readYAMLFile(config.pathURL);
     //  Create synLabelsMap
     const synLabelsMap = new Map();
     const { repoLabels: synLabels } = YAML.parse(file);

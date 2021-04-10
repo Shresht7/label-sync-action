@@ -24,8 +24,7 @@ const config: Config = {
         create: convertStrToBoolean(core.getInput('create')),
         update: convertStrToBoolean(core.getInput('update')),
         delete: convertStrToBoolean(core.getInput('delete'))
-    },
-    firstRun: false
+    }
 }
 
 //  =================

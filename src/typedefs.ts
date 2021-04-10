@@ -32,7 +32,6 @@ export interface Config {
     }
     path: string    //  Path of the labels.yaml file
     pathURL: string //  Resolved URL path of the labels.yaml file
-    firstRun?: boolean  //  If .github/labels.yaml is not found. Action assumes it is the first run. Creates the labels.yaml file automatically
 }
 
 //  LabelsMap

@@ -1,6 +1,6 @@
 import * as YAML from 'yaml'    //  YAML parser
 
-import { getRepoLabels } from '../utils'    //  Get's repository label-data
+import { getRepoLabels, readYAMLFile } from '../utils'    //  Get's repository label-data
 
 import { Config, core, github, GitHubLabel, octokit } from '../typedefs'    //  Type definitions
 
@@ -13,7 +13,9 @@ const syncSynLabels = async (config: Config, core: core, octokit: octokit, githu
     const repoLabelsMap = await getRepoLabels(octokit, github)  //  Get repo's label-data
     let yamlContent = ''
 
-    if (!config.firstRun) {
+    const { firstRun } = readYAMLFile(config.pathURL)
+
+    if (!firstRun) {
         let { payload: { action, label } } = github.context
         
         //  Only keep properties that are needed
@@ -51,7 +53,7 @@ const syncSynLabels = async (config: Config, core: core, octokit: octokit, githu
 
     //  Get .github/labels.yaml file (if it exists). For SHA
     let SHA
-    if (!config.firstRun) {
+    if (!firstRun) {
         const { data } = await octokit.repos.getContent({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,

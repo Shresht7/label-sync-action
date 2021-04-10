@@ -1,5 +1,4 @@
 import * as fs from 'fs'    //  File-System Module
-import * as core from '@actions/core'   //  GitHub Actions toolkit core
 import * as YAML from 'yaml'    //  YAML parser
 
 import { octokit, github, GitHubLabel, Config, LabelsMap } from './typedefs'    //  Type definitions
@@ -8,16 +7,24 @@ import { octokit, github, GitHubLabel, Config, LabelsMap } from './typedefs'    
 //  GET LABELS
 //  ==========
 
+//  Read file from path
+export const readYAMLFile = (path: string): { file: string, firstRun: boolean } => {
+    let file = ''
+    let firstRun = false
+
+    try {
+        file = fs.readFileSync(path, 'utf-8')
+    } catch(err) {
+        firstRun = true
+    }
+
+    return { file, firstRun }
+}
+
 //  Read Labels from the .github/labels.yaml file and returns a LabelsMap
 export const getSynLabels = (config: Config): LabelsMap => {
     //  Read file from directory
-    let file = ''
-    try {
-        file = fs.readFileSync(config.pathURL, 'utf8')
-    } catch(err) {
-        core.warning(`Could not read ${config.pathURL}. Assuming empty file`)
-        config.firstRun = true
-    }
+    const { file } = readYAMLFile(config.pathURL)
 
     //  Create synLabelsMap
     const synLabelsMap = new Map()
