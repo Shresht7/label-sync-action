@@ -35,7 +35,6 @@ const core = __importStar(__nccwpck_require__(115)); //  GitHub Action toolkit c
 const workspaceURL = process.env.GITHUB_WORKSPACE || '';
 let fileName = 'labels.yaml'; //  .github/labels.yaml
 const filePath = path.join('.github', fileName);
-console.log(workspaceURL, filePath);
 //  Converts core.getInput() -> string to a boolean
 const convertStrToBoolean = (str) => str.toLowerCase() === 'true';
 const config = {
@@ -99,7 +98,7 @@ const octokit = github.getOctokit(GITHUB_ACCESS_TOKEN);
 //  =====================
 //  EXECUTE GITHUB ACTION
 //  =====================
-if (github.context.eventName === 'label') { //  If action was triggered by the label webhook event (when user changes the labels manually)
+if (github.context.eventName === 'label' || github.context.eventName === 'workflow_dispatch') { //  If action was triggered by the label webhook event (when user changes the labels manually)
     core.info('Syncing your changes with ./github/labels.yaml');
     //  Sync user's changes to .github/labels.yaml file
     syncSynLabels_1.default(config_1.default, core, octokit, github)
@@ -377,12 +376,12 @@ const readYAMLFile = (path) => {
 exports.readYAMLFile = readYAMLFile;
 //  Read Labels from the .github/labels.yaml file and returns a LabelsMap
 const getSynLabels = (config) => {
-    var _a;
     //  Read file from directory
     const { file } = exports.readYAMLFile(config.pathURL);
     //  Create synLabelsMap
     const synLabelsMap = new Map();
-    const { repoLabels: synLabels } = (_a = YAML.parse(file)) !== null && _a !== void 0 ? _a : { repoLabels: [] };
+    const parsedYAML = YAML.parse(file);
+    const synLabels = parsedYAML === null || parsedYAML === void 0 ? void 0 : parsedYAML.repoLabels;
     synLabels === null || synLabels === void 0 ? void 0 : synLabels.forEach(label => synLabelsMap.set(label.name, label));
     return synLabelsMap;
 };

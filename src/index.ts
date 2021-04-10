@@ -18,7 +18,7 @@ const octokit = github.getOctokit(GITHUB_ACCESS_TOKEN)
 //  EXECUTE GITHUB ACTION
 //  =====================
 
-if (github.context.eventName === 'label') { //  If action was triggered by the label webhook event (when user changes the labels manually)
+if (github.context.eventName === 'label' || github.context.eventName === 'workflow_dispatch') { //  If action was triggered by the label webhook event (when user changes the labels manually)
     core.info('Syncing your changes with ./github/labels.yaml')
 
     //  Sync user's changes to .github/labels.yaml file
