@@ -292,14 +292,18 @@ const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 
         return;
     }
     //  Get .github/labels.yaml file (if it exists). For SHA
-    const { data } = yield octokit.repos.getContent({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        path: config.path
-    });
-    if (Array.isArray(data)) {
-        return;
-    } //  If the response is not for a single file then exit
+    let SHA;
+    if (!config.firstRun) {
+        const { data } = yield octokit.repos.getContent({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            path: config.path
+        });
+        if (Array.isArray(data)) {
+            return;
+        } //  If the response is not for a single file then exit
+        SHA = data.sha;
+    }
     //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
     yield octokit.repos.createOrUpdateFileContents({
         owner: github.context.repo.owner,
@@ -307,7 +311,7 @@ const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 
         path: config.path,
         message: config.commitMessage,
         content: Buffer.from(yamlContent).toString('base64'),
-        sha: data.sha
+        sha: SHA
     });
 });
 //  ========================
