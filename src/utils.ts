@@ -28,7 +28,7 @@ export const getSynLabels = (config: Config): LabelsMap => {
 
     //  Create synLabelsMap
     const synLabelsMap = new Map()
-    const { repoLabels: synLabels } : { repoLabels: GitHubLabel[] } = YAML.parse(file)
+    const { repoLabels: synLabels } : { repoLabels: GitHubLabel[] } = YAML.parse(file) ?? { repoLabels: [] }
     synLabels?.forEach(label => synLabelsMap.set(label.name, label))
 
     return synLabelsMap

@@ -376,11 +376,12 @@ const readYAMLFile = (path) => {
 exports.readYAMLFile = readYAMLFile;
 //  Read Labels from the .github/labels.yaml file and returns a LabelsMap
 const getSynLabels = (config) => {
+    var _a;
     //  Read file from directory
     const { file } = exports.readYAMLFile(config.pathURL);
     //  Create synLabelsMap
     const synLabelsMap = new Map();
-    const { repoLabels: synLabels } = YAML.parse(file);
+    const { repoLabels: synLabels } = (_a = YAML.parse(file)) !== null && _a !== void 0 ? _a : { repoLabels: [] };
     synLabels === null || synLabels === void 0 ? void 0 : synLabels.forEach(label => synLabelsMap.set(label.name, label));
     return synLabelsMap;
 };
