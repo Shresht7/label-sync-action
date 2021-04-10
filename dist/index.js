@@ -104,14 +104,14 @@ if (github.context.eventName === 'label') { //  If action was triggered by the l
     //  Sync user's changes to .github/labels.yaml file
     syncSynLabels_1.default(config_1.default, core, octokit, github)
         .then(() => core.info(`Your changes have been synced to ${config_1.default.path}`))
-        .catch((err) => core.setFailed(err.message));
+        .catch((err) => core.setFailed(err));
 }
 else { //  If the action was triggered on push or manually by workflow_dispatch //TODO:  Use better else clause if possible
     core.info('Syncing labels from ./github/labels.yaml to your repository');
     //  Sync label-data from .github/labels.yaml to this repository
     syncRepoLabels_1.default(config_1.default, core, octokit, github)
         .then(() => core.info(`Successfully synced label-data from ${config_1.default.path} to this repository`))
-        .catch((err) => core.setFailed(err.message));
+        .catch((err) => core.setFailed(err));
 }
 
 
