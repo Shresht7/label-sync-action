@@ -1,3 +1,9 @@
+# ============================================
+#                   SYN-LABELS
+# --------------------------------------------
+# GitHub Action to manage labels declaratively
+# ============================================
+
 name: SynLabels
 
 # Activation Events
