@@ -1,5 +1,4 @@
-repoLabels:
-
+labels:
   - name: bug
     color: ee1111
     description: Something isn't working

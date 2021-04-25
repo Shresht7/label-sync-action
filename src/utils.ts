@@ -1,5 +1,4 @@
 import * as fs from 'fs'    //  File-System Module
-import * as core from '@actions/core'   //  Github Actions toolkit
 import * as YAML from 'yaml'    //  YAML parser
 
 import { octokit, github, GitHubLabel, Config, LabelsMap } from './typedefs'    //  Type definitions
@@ -30,7 +29,7 @@ export const getSynLabels = (config: Config): LabelsMap => {
     //  Create synLabelsMap
     const synLabelsMap = new Map()
     const parsedYAML = YAML.parse(file)
-    const synLabels: GitHubLabel[] = parsedYAML?.repoLabels
+    const synLabels: GitHubLabel[] = parsedYAML?.labels
     synLabels?.forEach(label => synLabelsMap.set(label.name, label))
 
     return synLabelsMap
@@ -87,7 +86,7 @@ export const labelSorter = (existingLabelsMap: LabelsMap, configLabelsMap: Label
     })
 
     //  Delete list
-    existingLabelsMap.forEach((label, labelName) => {
+    existingLabelsMap.forEach((_label, labelName) => {
         !configLabelsMap.has(labelName) && deleteLabels.push(labelName)
     })
 
