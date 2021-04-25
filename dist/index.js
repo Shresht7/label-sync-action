@@ -284,7 +284,7 @@ const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 
     repoLabelsMap.forEach(label => repoLabels.push(label));
     //  YAMLify repoLabels
     yamlContent = YAML.stringify(repoLabels);
-    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1'); //  Add additional \n for clarity sake
+    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '$1'); //  Add additional \n for clarity sake
     //  Log and exit if Dry-Run Mode
     if (config.dryRun) {
         core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');

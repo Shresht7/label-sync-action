@@ -42,7 +42,7 @@ const syncSynLabels = async (config: Config, core: core, octokit: octokit, githu
 
     //  YAMLify repoLabels
     yamlContent = YAML.stringify(repoLabels)
-    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1')   //  Add additional \n for clarity sake
+    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '$1')   //  Add additional \n for clarity sake
 
     //  Log and exit if Dry-Run Mode
     if (config.dryRun) {
