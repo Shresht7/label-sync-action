@@ -75,7 +75,7 @@ NOTE: Potential changes will only be logged if dry run is `true`. For SynLabels 
 The config file (`.github/labels.yaml`) will look something like this:
 
 ```yaml
-labels:
+repoLabels:
   - name: bug
     color: ee1111
     description: Something isn't working
