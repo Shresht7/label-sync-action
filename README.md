@@ -75,18 +75,17 @@ NOTE: Potential changes will only be logged if dry run is `true`. For SynLabels 
 The config file (`.github/labels.yaml`) will look something like this:
 
 ```yaml
-labels:
-  - name: bug
-    color: ee1111
-    description: Something isn't working
+- name: bug
+  color: ee1111
+  description: Something isn't working
 
-  - name: documentation
-    color: 0e8a16
-    description: Improvements or additions to the documentation
+- name: documentation
+  color: 0e8a16
+  description: Improvements or additions to the documentation
 
-  - name: enhancement
-    color: a2eeef
-    description: New feature or request
+- name: enhancement
+  color: a2eeef
+  description: New feature or request
 
 ```
 

@@ -37,11 +37,11 @@ const syncSynLabels = async (config: Config, core: core, octokit: octokit, githu
     }
     
     //  Create array
-    let labels: GitHubLabel[] = []
-    repoLabelsMap.forEach(label => labels.push(label))
+    let repoLabels: GitHubLabel[] = []
+    repoLabelsMap.forEach(label => repoLabels.push(label))
 
     //  YAMLify repoLabels
-    yamlContent = YAML.stringify({ labels })
+    yamlContent = YAML.stringify(repoLabels)
     yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1')   //  Add additional \n for clarity sake
 
     //  Log and exit if Dry-Run Mode

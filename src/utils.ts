@@ -29,7 +29,7 @@ export const getSynLabels = (config: Config): LabelsMap => {
     //  Create synLabelsMap
     const synLabelsMap = new Map()
     const parsedYAML = YAML.parse(file)
-    const synLabels: GitHubLabel[] = parsedYAML?.labels
+    const synLabels: GitHubLabel[] = parsedYAML
     synLabels?.forEach(label => synLabelsMap.set(label.name, label))
 
     return synLabelsMap
@@ -44,12 +44,7 @@ export const getRepoLabels = async (octokit: octokit, github: github): Promise<L
     })
 
     //  Returns a sub-set of the response data
-    const repoLabels = data.map(label => ({
-            name: label.name,
-            color: label.color,
-            description: label.description
-        })
-    )
+    const repoLabels = data.map(({ name, color, description }) => ({ name, color, description }))
 
     //  Create repoLabelsMap
     const repoLabelsMap: LabelsMap = new Map()

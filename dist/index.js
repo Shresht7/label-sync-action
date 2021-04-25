@@ -280,10 +280,10 @@ const syncSynLabels = (config, core, octokit, github) => __awaiter(void 0, void 
         }
     }
     //  Create array
-    let labels = [];
-    repoLabelsMap.forEach(label => labels.push(label));
+    let repoLabels = [];
+    repoLabelsMap.forEach(label => repoLabels.push(label));
     //  YAMLify repoLabels
-    yamlContent = YAML.stringify({ labels });
+    yamlContent = YAML.stringify(repoLabels);
     yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '\n$1'); //  Add additional \n for clarity sake
     //  Log and exit if Dry-Run Mode
     if (config.dryRun) {
@@ -381,7 +381,7 @@ const getSynLabels = (config) => {
     //  Create synLabelsMap
     const synLabelsMap = new Map();
     const parsedYAML = YAML.parse(file);
-    const synLabels = parsedYAML === null || parsedYAML === void 0 ? void 0 : parsedYAML.labels;
+    const synLabels = parsedYAML;
     synLabels === null || synLabels === void 0 ? void 0 : synLabels.forEach(label => synLabelsMap.set(label.name, label));
     return synLabelsMap;
 };
@@ -394,11 +394,7 @@ const getRepoLabels = (octokit, github) => __awaiter(void 0, void 0, void 0, fun
         repo: github.context.repo.repo
     });
     //  Returns a sub-set of the response data
-    const repoLabels = data.map(label => ({
-        name: label.name,
-        color: label.color,
-        description: label.description
-    }));
+    const repoLabels = data.map(({ name, color, description }) => ({ name, color, description }));
     //  Create repoLabelsMap
     const repoLabelsMap = new Map();
     repoLabels.forEach(label => repoLabelsMap.set(label.name, label));
