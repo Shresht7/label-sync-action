@@ -30,13 +30,17 @@ const syncRepoLabels = async (config: Config, core: coreType, octokit: octokit, 
             core.info(writeLabelMessage('CREATE', label))
             if (config.dryRun) { return }   //  If Dry-Run then exit
         
-            await octokit.issues.createLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name,
-                color: label.color || '000000',
-                description: label.description || ''
-            })
+            try {
+                await octokit.issues.createLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name,
+                    color: label.color || '000000',
+                    description: label.description || ''
+                })
+            } catch (err) {
+                core.setFailed(err)
+            }
         })
     }
 
@@ -54,13 +58,17 @@ const syncRepoLabels = async (config: Config, core: coreType, octokit: octokit, 
             core.info(writeLabelMessage('UPDATE', label))
             if (config.dryRun) { return }   //  If Dry-Run then exit
             
-            await octokit.issues.updateLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name,
-                color: label.color || '000000',
-                description: label.description || ''
-            })
+            try {
+                await octokit.issues.updateLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name,
+                    color: label.color || '000000',
+                    description: label.description || ''
+                })
+            } catch (err) {
+                core.setFailed(err)
+            }
         })
     }
     
@@ -77,11 +85,15 @@ const syncRepoLabels = async (config: Config, core: coreType, octokit: octokit, 
             core.info(writeLabelMessage('DELETE', label))
             if (config.dryRun) { return }   //  If Dry-Run then exit
 
-            await octokit.issues.deleteLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name
-            })
+            try {
+                await octokit.issues.deleteLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name
+                })
+            } catch (err) {
+                core.setFailed(err)
+            }
         })
     }
 }

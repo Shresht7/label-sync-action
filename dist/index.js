@@ -158,13 +158,18 @@ const syncRepoLabels = (config, core, octokit, github) => __awaiter(void 0, void
             if (config.dryRun) {
                 return;
             } //  If Dry-Run then exit
-            yield octokit.issues.createLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name,
-                color: label.color || '000000',
-                description: label.description || ''
-            });
+            try {
+                yield octokit.issues.createLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name,
+                    color: label.color || '000000',
+                    description: label.description || ''
+                });
+            }
+            catch (err) {
+                core.setFailed(err);
+            }
         }));
     }
     //  UPDATE LABELS
@@ -180,13 +185,18 @@ const syncRepoLabels = (config, core, octokit, github) => __awaiter(void 0, void
             if (config.dryRun) {
                 return;
             } //  If Dry-Run then exit
-            yield octokit.issues.updateLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name,
-                color: label.color || '000000',
-                description: label.description || ''
-            });
+            try {
+                yield octokit.issues.updateLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name,
+                    color: label.color || '000000',
+                    description: label.description || ''
+                });
+            }
+            catch (err) {
+                core.setFailed(err);
+            }
         }));
     }
     //  DELETE LABELS
@@ -202,11 +212,16 @@ const syncRepoLabels = (config, core, octokit, github) => __awaiter(void 0, void
             if (config.dryRun) {
                 return;
             } //  If Dry-Run then exit
-            yield octokit.issues.deleteLabel({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                name: label.name
-            });
+            try {
+                yield octokit.issues.deleteLabel({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: label.name
+                });
+            }
+            catch (err) {
+                core.setFailed(err);
+            }
         }));
     }
 });
