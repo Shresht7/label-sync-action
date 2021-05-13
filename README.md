@@ -16,6 +16,12 @@ If the config file (`.github/labels.yaml`) does not exist when the action execut
 Create a workflow file `.github/workflows/Synlabels.yaml` and configure the input parameters.
 
 ```yaml
+# ============================================
+#                   SYN-LABELS
+# --------------------------------------------
+# GitHub Action to manage labels declaratively
+# ============================================
+
 name: SynLabels
 
 # Activation Events
@@ -49,7 +55,7 @@ jobs:
       # ========================
 
       - name: SynLabels
-        uses: Shresht7/SynLabels-Action@v1
+        uses: Shresht7/SynLabels-Action@v1.0.0
         id: SynLabels
 
         # Config Parameters
@@ -91,4 +97,4 @@ The config file (`.github/labels.yaml`) will look something like this:
 
 ## Permissions
 
-This actions needs the `GITHUB_TOKEN` secret to use the GitHub API in order to modify labels.
+This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to modify labels.
