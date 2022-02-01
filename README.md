@@ -53,7 +53,7 @@ jobs:
       # ========================
 
       - name: SynLabels
-        uses: Shresht7/SynLabels-Action@v1
+        uses: Shresht7/SynLabels-Action@v1.0.1
         id: SynLabels
 
         # Config Parameters
