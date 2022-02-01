@@ -14,7 +14,7 @@ export const readYAMLFile = (path: string): { file: string, firstRun: boolean } 
 
     try {
         file = fs.readFileSync(path, 'utf8')
-    } catch(err) {
+    } catch (err) {
         firstRun = true
     }
 
@@ -35,20 +35,15 @@ export const getSynLabels = (config: Config): LabelsMap => {
     return synLabelsMap
 }
 
-//  Gets all labels in current repository
-export const getRepoLabels = async (octokit: octokit, github: github): Promise<LabelsMap> => {
-    //  Fetch Labels for current repo
-    const { data } = await octokit.issues.listLabelsForRepo({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo
-    })
-
-    //  Returns a sub-set of the response data
-    const repoLabels = data.map(({ name, color, description }) => ({ name, color, description }))
-
-    //  Create repoLabelsMap
+/** Returns a list of all labels in the current repository */
+export const getRepoLabels = async (octokit: octokit, { context: { repo: { owner, repo } } }: github): Promise<LabelsMap> => {
     const repoLabelsMap: LabelsMap = new Map()
-    repoLabels.forEach(label => repoLabelsMap.set(label.name, label))
+
+    //  Fetch labels for current repo
+    const labelIterator = octokit.paginate.iterator(octokit.issues.listLabelsForRepo, { owner, repo })
+    for await (const { data } of labelIterator) {
+        data.forEach(({ name, color, description }) => repoLabelsMap.set(name, { name, color, description }))
+    }
 
     return repoLabelsMap
 }
@@ -74,7 +69,7 @@ export const labelSorter = (existingLabelsMap: LabelsMap, configLabelsMap: Label
                 updateLabels.push(labelName)    //  Sort in updateLabels array
             }
 
-        //  If Label does not exist
+            //  If Label does not exist
         } else {
             createLabels.push(labelName)    //  Sort in createLabels array
         }
@@ -93,7 +88,7 @@ export const labelSorter = (existingLabelsMap: LabelsMap, configLabelsMap: Label
 //  ===================
 
 //  Returns the label message to be displayed on console
-export const writeLabelMessage = (mode: 'CREATE'|'UPDATE'|'DELETE', label: GitHubLabel): string => {
+export const writeLabelMessage = (mode: 'CREATE' | 'UPDATE' | 'DELETE', label: GitHubLabel): string => {
 
     //  Maps modes to ANSI colors
     const colorMap = {
@@ -109,7 +104,7 @@ export const writeLabelMessage = (mode: 'CREATE'|'UPDATE'|'DELETE', label: GitHu
         const r = parseInt(hex.substring(0, 2), 16)
         const g = parseInt(hex.substring(2, 4), 16)
         const b = parseInt(hex.substring(4, 6), 16)
-    
+
         return `\u001b[38;2;${r};${g};${b}m${str}${colorMap.RESET}`
     }
 
