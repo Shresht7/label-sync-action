@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Shresht7/SynLabels-Action#readme",
   "devDependencies": {
-    "@types/node": "^14.14.37",
+    "@types/node": "^17.0.21",
     "typescript": "^4.2.4"
   },
   "dependencies": {
