@@ -20,7 +20,7 @@
   "homepage": "https://github.com/Shresht7/SynLabels-Action#readme",
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.2"
   },
   "dependencies": {
     "@actions/core": "^1.6.0",
