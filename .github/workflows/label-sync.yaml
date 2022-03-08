@@ -31,7 +31,7 @@ jobs:
 
       # Required for GITHUB_WORKSPACE
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Execute label-sync Action
       # ========================
