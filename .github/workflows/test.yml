@@ -1,0 +1,36 @@
+# ==============
+# BUILD AND TEST
+# ==============
+
+name: Build-Test
+
+# Activation Events
+# =================
+
+on: # rebuild any PRs and main branch changes
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+# Jobs
+# ====
+
+jobs:
+  build: # make sure build/ci work properly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          npm install
+      - run: |
+          npm run build
+
+  test: # make sure the action works on a clean machine without building
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          url: https://github.com/Shresht7/web-screenshot-action

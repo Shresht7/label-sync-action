@@ -1,0 +1,43 @@
+# ===============
+# PUBLISH RELEASE
+# ===============
+
+name: Publish
+
+# Activation Events
+# =================
+
+on:
+  # When a release is published or edited
+  release:
+    types: [published, edited]
+
+# Jobs
+# ====
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    
+      # Actions/Checkout ✅
+      # -------------------
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+    
+      # Install dependencies and Build 📦
+      # ---------------------------------
+
+      - name: Install dependencies and build
+        run: npm ci && npm run build
+    
+      # Build and Tag 🏷
+      # ----------------
+
+      - uses: JasonEtco/build-and-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
