@@ -14,13 +14,10 @@ export async function getConfigLabels(): Promise<LabelMap> {
         .then(res => res)
         .catch(_ => "")
 
-    console.log(file)
-
     const configLabels: LabelMap = new Map()
     const labels: GitHubLabel[] = yaml.load(file) as GitHubLabel[]
     labels.forEach(label => configLabels.set(label.name, label))
 
-    console.log(labels)
     return configLabels
 
 }
