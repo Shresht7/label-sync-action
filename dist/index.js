@@ -333,11 +333,9 @@ function getConfigLabels() {
         const file = yield fs.promises.readFile(config.pathURL, { encoding: 'utf-8' })
             .then(res => res)
             .catch(_ => "");
-        console.log(file);
         const configLabels = new Map();
         const labels = yaml.load(file);
         labels.forEach(label => configLabels.set(label.name, label));
-        console.log(labels);
         return configLabels;
     });
 }
