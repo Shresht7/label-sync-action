@@ -6,7 +6,8 @@
   "scripts": {
     "tsc": "tsc",
     "package": "ncc build ./build/index.js --license licenses.txt",
-    "build": "npm run tsc && npm run package"
+    "build": "npm run tsc && npm run package",
+    "clean": "npx rimraf node_modules dist"
   },
   "repository": {
     "type": "git",
