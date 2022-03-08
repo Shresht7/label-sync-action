@@ -2,12 +2,12 @@
   "name": "label-sync-action",
   "version": "1.0.1",
   "description": "GitHub Action to synchronize and manage labels 🏷",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "tsc": "tsc",
-    "package": "ncc build ./build/index.js --license licenses.txt",
+    "package": "ncc build --source-map --license licenses.txt",
     "build": "npm run tsc && npm run package",
-    "clean": "npx rimraf node_modules dist"
+    "clean": "npx rimraf dist"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/Shresht7/label-sync-action#README",
   "devDependencies": {
     "@types/node": "^17.0.21",
+    "@vercel/ncc": "^0.33.3",
     "typescript": "^4.6.2"
   },
   "dependencies": {
