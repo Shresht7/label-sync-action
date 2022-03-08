@@ -333,9 +333,11 @@ function getConfigLabels() {
         const file = yield fs.promises.readFile(config.pathURL, { encoding: 'utf-8' })
             .then(res => res)
             .catch(_ => "");
+        console.log(file);
         const configLabels = new Map();
         const labels = yaml.load(file);
         labels.forEach(label => configLabels.set(label.name, label));
+        console.log(labels);
         return configLabels;
     });
 }
@@ -705,7 +707,6 @@ function syncRepoLabels() {
                 if (!label) {
                     return;
                 } //  If label is undefined, exit
-                console.log(label);
                 core.info((0, helpers_2.write)('UPDATE', label));
                 if (config.isDryRun) {
                     return;

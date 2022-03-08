@@ -56,7 +56,6 @@ export async function syncRepoLabels() {
             const label = configLabels.get(labelName)   //  Get label object from LabelMap
             if (!label) { return }  //  If label is undefined, exit
 
-            console.log(label)
             core.info(write('UPDATE', label))
             if (config.isDryRun) { return }
 
