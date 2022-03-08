@@ -1,7 +1,7 @@
 {
-  "name": "syn-labels-action",
+  "name": "label-sync-action",
   "version": "1.0.1",
-  "description": "Manage your repository labels using a config file. Create, update and delete labels declaratively by editing the config. Share this config with other repos to keep their labels in sync!",
+  "description": "GitHub Action to synchronize and manage labels 🏷",
   "main": "dist/index.js",
   "scripts": {
     "tsc": "tsc",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Shresht7/SynLabels-Action.git"
+    "url": "git+https://github.com/Shresht7/label-sync-action.git"
   },
   "author": "Shresht7",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Shresht7/SynLabels-Action/issues"
+    "url": "https://github.com/Shresht7/label-sync-action/issues"
   },
-  "homepage": "https://github.com/Shresht7/SynLabels-Action#readme",
+  "homepage": "https://github.com/Shresht7/label-sync-action#README",
   "devDependencies": {
     "@types/node": "^17.0.21",
     "typescript": "^4.6.2"

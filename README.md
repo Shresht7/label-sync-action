@@ -1,26 +1,26 @@
-# SynLabels
+# label-sync-action 🏷
 
-**SynLabels** syncs your repository's labels in the `.github/labels.yaml` config file.
+GitHub Action to synchronize and manage your repository's labels 🏷
 
-You can _create_, _update_ and _delete_ labels declaratively by editing this file and pushing those changes to the **default branch** of your repo. Any edits you make manually using GitHub's UI will also be synced back into this file.
+You can _create_, _update_ and _delete_ labels declaratively by editing the config file and pushing those changes to the **default branch** of your repo. Any edits you make manually using GitHub's UI will also be synced back into this file.
 
-You can share this file with any other repos that employ this action to port labels from one repo to another.
+You can share this config with any other repos that employ this action to port labels from one repo to another.
 
 The action will sync repo-labels when you push an edit to the config file (`.github/labels.yaml`) to the default branch or when the `label` webhook event is triggered. You can also activate the action manually (`workflow_dispatch`) from the Actions tab.
 If the config file (`.github/labels.yaml`) does not exist when the action executes, it will create the file automatically and fill in the details of the labels used in your repository.
 
 ### Workflow setup
 
-Create a workflow file `.github/workflows/Synlabels.yaml` and configure the input parameters.
+Create a workflow file `.github/workflows/label-sync.yaml` and configure the input parameters.
 
 ```yaml
 # ============================================
-#                   SYN-LABELS
+#                   LABEL-SYNC
 # --------------------------------------------
 # GitHub Action to manage labels declaratively
 # ============================================
 
-name: SynLabels
+name: label-sync
 
 # Activation Events
 # =================
@@ -36,10 +36,10 @@ on:
 # ====
 
 jobs:
-  SynLabels:
+  label-sync:
     runs-on: ubuntu-latest
     
-    name: SynLabels
+    name: label-sync
     steps:
     
       # Actions/Checkout
@@ -49,22 +49,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Execute SynLabels Action
-      # ========================
+      # Execute Label Sync Action
+      # =========================
 
-      - name: SynLabels
-        uses: Shresht7/SynLabels-Action@v1.0.1
-        id: SynLabels
+      - name: label-sync
+        uses: Shresht7/label-sync-action@main
+        id: label-sync
 
         # Config Parameters
         # -----------------
 
         with:
-          commitmessage: SynLabels Update # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)
+          commitmessage: Update labels 🏷 # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: label-sync Update)
           dryrun: true    # Will not make any actual changes if true (default: true)
-          create: true    # If true, SynLabels has permissions to create labels (default: true)
-          update: true    # If true, SynLabels has permissions to update labels (default: true)
-          delete: false   # If true, SynLabels has permissions to delete labels (default: false)
+          create: true    # If true, label-sync has permissions to create labels (default: true)
+          update: true    # If true, label-sync has permissions to update labels (default: true)
+          delete: false   # If true, label-sync has permissions to delete labels (default: false)
 
         # Environment Variables
         # ---------------------
@@ -72,7 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
 ```
-NOTE: Potential changes will only be logged if dry run is `true`. For SynLabels to actually modify anything you will have to set `dryrun` to `false`.
+NOTE: Potential changes will only be logged if dry run is `true`. For label-sync to actually modify anything you will have to set `dryrun` to `false`.
 
 ### Example Config
 

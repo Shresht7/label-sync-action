@@ -1,8 +1,8 @@
-# =========
-# SynLabels
-# =========
+# ==========
+# LABEL-SYNC
+# ==========
 
-name: SynLabels
+name: label-sync
 author: Shresht7
 description: Create, update, and delete labels from your repository declaratively
 
@@ -19,35 +19,35 @@ inputs:
   # --------------
 
   dryrun:
-    description: "Dry Run toggle. SynLabels will not make any actual changes if true (default: true)"
+    description: "Dry Run toggle. label-sync will not make any actual changes if true (default: true)"
     default: true
 
   # Commit Message
   # --------------
 
   commitmessage:
-    description: "Commit Message. Shown when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)"
+    description: "Commit Message. Shown when label-sync updates .github/labels.yaml file in the repo (default: Update labels 🏷)"
     required: true
-    default: SynLabels Update
+    default: Update labels 🏷
 
   # Permissions
   # -----------
 
   create:
-    description: "If true, SynLabels has permission to create labels (default: true)"
+    description: "If true, label-sync has permission to create labels (default: true)"
     default: true
 
   update:
-    description: "If true, SynLabels has permission to update labels (default: true)"
+    description: "If true, label-sync has permission to update labels (default: true)"
     default: true
 
   delete:
-    description: "If true, SynLabels has permission to delete labels (default: false)"
+    description: "If true, label-sync has permission to delete labels (default: false)"
     default: false
 
 # Run
 # ===
 
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"

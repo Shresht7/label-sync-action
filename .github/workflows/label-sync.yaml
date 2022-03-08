@@ -1,10 +1,10 @@
 # ============================================
-#                   SYN-LABELS
+#                   LABEL-SYNC
 # --------------------------------------------
 # GitHub Action to manage labels declaratively
 # ============================================
 
-name: SynLabels
+name: label-sync
 
 # Activation Events
 # =================
@@ -20,10 +20,10 @@ on:
 # ====
 
 jobs:
-  SynLabels:
+  label-sync:
     runs-on: ubuntu-latest
     
-    name: SynLabels
+    name: label-sync
     steps:
     
       # Actions/Checkout
@@ -33,22 +33,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Execute SynLabels Action
+      # Execute label-sync Action
       # ========================
 
-      - name: SynLabels
-        uses: Shresht7/SynLabels-Action@v1.0.1
-        id: SynLabels
+      - name: label-sync
+        uses: Shresht7/label-sync-action@main
+        id: label-sync
 
         # Config Parameters
         # -----------------
 
         with:
-          commitmessage: SynLabels Update # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: SynLabels Update)
+          commitmessage: Update labels 🏷 # The commit message when label-sync updates .github/labels.yaml file in the repo (default: label-sync Update)
           dryrun: true    # Will not make any actual changes if true (default: true)
-          create: true    # If true, SynLabels has permissions to create labels (default: true)
-          update: true    # If true, SynLabels has permissions to update labels (default: true)
-          delete: false   # If true, SynLabels has permissions to delete labels (default: false)
+          create: true    # If true, label-sync has permissions to create labels (default: true)
+          update: true    # If true, label-sync has permissions to update labels (default: true)
+          delete: false   # If true, label-sync has permissions to delete labels (default: false)
 
         # Environment Variables
         # ---------------------
