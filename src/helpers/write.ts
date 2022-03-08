@@ -15,6 +15,7 @@ export const write = (mode: MODE, label: GitHubLabel) =>
 /** Colors the string using the given hex-code */
 function color(str: string, hex: string) {
 
+    console.log(str, hex)
     hex = hex.startsWith('#') ? hex.slice(1) : hex
     const r = parseInt(hex.substring(0, 2), 16)
     const g = parseInt(hex.substring(0, 2), 16)

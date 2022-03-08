@@ -87,6 +87,7 @@ const write = (mode, label) => `${colorMap[mode]}${mode[0] + mode.slice(1, -1).t
 exports.write = write;
 /** Colors the string using the given hex-code */
 function color(str, hex) {
+    console.log(str, hex);
     hex = hex.startsWith('#') ? hex.slice(1) : hex;
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(0, 2), 16);
