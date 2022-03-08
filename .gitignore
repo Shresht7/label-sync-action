@@ -83,6 +83,7 @@ typings/
 
 #   TypeScript output
 build
+lib
 
 #   GitHub Action requires this folder
 # dist
