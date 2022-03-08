@@ -38,3 +38,9 @@ jobs:
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
           delete: false   # If true, label-sync has permissions to delete labels (default: false)
+
+        # Environment Variables
+        # ---------------------
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
