@@ -72,7 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
 ```
-NOTE: Potential changes will only be logged if dry run is `true`. For label-sync to actually modify anything you will have to set `dryrun` to `false`.
+> NOTE: Potential changes will only be logged if dry run is `true`. For label-sync to actually modify anything you will have to set `dryrun` to `false`.
 
 ### Example Config
 
@@ -80,18 +80,20 @@ The config file (`.github/labels.yaml`) will look something like this:
 
 ```yaml
 - name: bug
-  color: ee1111
+  color: '#ee1111'
   description: Something isn't working
 
 - name: documentation
-  color: 0e8a16
+  color: '#0e8a16'
   description: Improvements or additions to the documentation
 
 - name: enhancement
-  color: a2eeef
+  color: '#a2eeef'
   description: New feature or request
 
 ```
+
+> NOTE: Wrap colors with quotation marks (like '#ffffff') or yaml will think anything following the `#` is a comment.
 
 ## Permissions
 
