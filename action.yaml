@@ -19,16 +19,8 @@ inputs:
   # --------------
 
   dryrun:
-    description: "Dry Run toggle. label-sync will not make any actual changes if true (default: true)"
+    description: "Dry-run toggle. label-sync will not make any actual changes if true (default: true)"
     default: true
-
-  # Commit Message
-  # --------------
-
-  commitmessage:
-    description: "Commit Message. Shown when label-sync updates .github/labels.yaml file in the repo (default: Update labels 🏷)"
-    required: true
-    default: Update labels 🏷
 
   # Permissions
   # -----------
@@ -44,6 +36,21 @@ inputs:
   delete:
     description: "If true, label-sync has permission to delete labels (default: false)"
     default: false
+
+  # Labels Config
+  # -------------
+
+  path:
+    description: "Configuration file-path for labels (default: .github/labels.yaml)"
+    default: .github/labels.yaml
+
+  # Commit Message
+  # --------------
+
+  commit-message:
+    description: "Commit Message. Shown when label-sync updates the config-file in the repo (default: Update labels 🏷)"
+    default: Update labels 🏷
+
 
 # Run
 # ===

@@ -1,12 +1,12 @@
 //  Library
-import * as fs from 'node:fs'
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as config from './config'
-import * as yaml from 'js-yaml'
 import { octokit } from './octokit'
+import * as yaml from 'js-yaml'
 
 //  Helpers
+import * as config from './config'
+import { getConfigLabels } from './getConfigLabels'
 import { getRepoLabels } from './getRepoLabels'
 
 //  Type Definitions
@@ -16,11 +16,9 @@ export async function syncConfigLabels() {
 
     const repoLabelsMap: LabelMap = await getRepoLabels()    //  Get repo's label data
 
-    const fileContent = await fs.promises.readFile(config.pathURL, { encoding: 'utf-8' })
-        .then(res => res)
-        .catch(_ => '')
+    const configLabelsMap = await getConfigLabels()
 
-    const firstRun = fileContent === ''
+    const firstRun = configLabelsMap.keys.length === 0
 
     if (!firstRun) {
         let { payload: { action, label } } = github.context

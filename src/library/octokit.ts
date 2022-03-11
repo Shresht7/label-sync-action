@@ -10,7 +10,7 @@ import * as github from '@actions/github'
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ''
 
 if (!GITHUB_TOKEN) {
-    core.setFailed('Invalid GITHUB_TOKEN');
+    core.error('Invalid GITHUB_TOKEN');
 }
 
 //  --------------------------------------------------
