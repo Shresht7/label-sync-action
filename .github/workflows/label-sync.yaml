@@ -10,11 +10,16 @@ name: label-sync
 # =================
 
 on:
+  # When .github/labels.yaml changes are pushed to the default branch
   push:
     paths:
-      - .github/labels.yaml # When .github/labels.yaml changes are pushed to the default branch
-  label:  # When a label webhook event (create, update, delete) is triggered
-  workflow_dispatch:  # When a workflow event is dispatched manually
+      - .github/labels.yaml
+  
+  # When a label webhook event (create, update, delete) is triggered
+  label:
+
+  # When a workflow event is dispatched manually
+  workflow_dispatch:
 
 # Jobs
 # ====
@@ -55,11 +60,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
 
-      - name: update-labels
-        id: update-labels
+      # Create pull-request with updated label config
+
+      - name: update-labels-config
+        id: update-labels-config
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          branch: 'label-sync'
           commit-message: 'Update labels 🏷'
           title: 'Update labels 🏷'
-          branch: 'label-sync'
