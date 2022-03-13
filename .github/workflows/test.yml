@@ -18,23 +18,20 @@ on: # rebuild any PRs and main branch changes
 # ====
 
 jobs:
-  build: # make sure build/ci work properly
+  build: # make sure build/ci works properly
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: |
           npm install
-      - run: |
           npm run build
 
   test: # make sure the action works on a clean machine without building
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./
         with:
-          commit-message: Update labels 🏷 # The commit message when label-sync updates .github/labels.yaml file in the repo (default: label-sync Update)
           dryrun: true    # Will not make any actual changes if true (default: true)
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
