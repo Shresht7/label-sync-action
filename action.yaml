@@ -44,8 +44,11 @@ inputs:
     description: "Configuration file-path for labels (default: .github/labels.yaml)"
     default: .github/labels.yaml
 
-  # Commit Message
-  # --------------
+  # Sync to File
+  # ------------
+
+  readonly: "Should not sync labels back to the config file. (default: false)"
+    default: false
 
   commit-message:
     description: "Commit Message. Shown when label-sync updates the config-file in the repo (default: Update labels 🏷)"
