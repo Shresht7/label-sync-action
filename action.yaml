@@ -47,7 +47,8 @@ inputs:
   # Sync to File
   # ------------
 
-  readonly: "Should not sync labels back to the config file. (default: false)"
+  readonly:
+    description: "Should not sync labels back to the config file. (default: false)"
     default: false
 
   commit-message:
