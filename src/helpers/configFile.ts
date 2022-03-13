@@ -3,7 +3,7 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 import isUrl from 'is-url-superb'
 
-/** Read Config File from given path/url */
+/** Read config file from given path or url */
 export const readConfigFile = (path: string) => isUrl(path)
     ? fetch(path).then(res => res.text())
     : fs.promises.readFile(path, { encoding: 'utf-8' })
@@ -14,9 +14,11 @@ export function parseConfig<T extends any[]>(contents: string, ext: string = 'ym
 
     if (ext.endsWith('json')) {
         result = JSON.parse(contents) as T
-    } else if (ext.endsWith('yml') || ext.endsWith('yaml')) {
+    }
+    else if (ext.endsWith('yml') || ext.endsWith('yaml')) {
         result = yaml.load(contents) as T
-    } else {
+    }
+    else {
         throw new Error('Incompatible config format. Please provide a `yaml` or `json` file.')
     }
 

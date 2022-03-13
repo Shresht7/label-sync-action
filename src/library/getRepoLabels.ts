@@ -1,6 +1,6 @@
 //  Library
-import { octokit } from './octokit'
 import * as github from '@actions/github'
+import { octokit } from './octokit'
 
 //  Type Definitions
 import type { LabelMap } from '../types'

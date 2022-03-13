@@ -20,6 +20,7 @@ export async function syncConfigLabels() {
 
     //  Get the webhook event action and the modified label
     let { payload: { action, label } } = github.context
+    core.info(`label ${label.name} ${action}`)
 
     //  Only keep the label properties that are needed, discard the rest
     label = {
