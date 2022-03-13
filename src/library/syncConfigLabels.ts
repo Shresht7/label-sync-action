@@ -11,11 +11,11 @@ import { getRepoLabels } from './getRepoLabels'
 
 //  Type Definitions
 import type { GitHubLabel, LabelMap } from '../types'
-import { createPullRequest } from '../helpers'
 
 export async function syncConfigLabels() {
 
     const repoLabelsMap: LabelMap = await getRepoLabels()    //  Get repo's label data
+
     const configLabelsMap = await getConfigLabels()
 
     const firstRun = configLabelsMap.keys.length === 0
@@ -56,5 +56,27 @@ export async function syncConfigLabels() {
         return
     }
 
-    await createPullRequest(config.path, yamlContent, 'Update label-sync')
+
+    //  Get .github/labels.yaml file (if it exists). For SHA
+    let SHA
+    if (!firstRun) {
+        const { data } = await octokit.rest.repos.getContent({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            path: config.path
+        })
+
+        if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
+        SHA = data.sha
+    }
+
+    //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
+    await octokit.rest.repos.createOrUpdateFileContents({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        path: config.path,
+        message: config.commitMessage,
+        content: Buffer.from(yamlContent).toString('base64'),
+        sha: SHA
+    })
 }
