@@ -6,6 +6,14 @@ import labelSync from './labelSync'
 //  MAIN
 //  ====
 
-labelSync()
-    .then(() => core.info('Synchronization Complete!'))
-    .catch(error => core.setFailed(error))
+async function run() {
+    try {
+        await labelSync()
+        core.info('Synchronization Complete!')
+    } catch (err) {
+        const error = err as Error
+        core.error(error)
+    }
+}
+
+run()

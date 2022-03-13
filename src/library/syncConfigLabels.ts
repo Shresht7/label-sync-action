@@ -56,5 +56,5 @@ export async function syncConfigLabels() {
         return
     }
 
-    await createPullRequest(config.path, yamlContent, 'Update label-sync', 'label-sync')
+    await createPullRequest(config.path, yamlContent, 'Update label-sync')
 }
