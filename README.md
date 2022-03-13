@@ -2,11 +2,9 @@
 
 GitHub Action to synchronize and manage your repository's labels 🏷
 
-You can _create_, _update_ and _delete_ labels declaratively by editing the config file and pushing those changes to the **default branch** of your repo. Any edits you make manually using GitHub's UI will also be synced back into this file.
+You can _create_, _update_ and _delete_ labels declaratively by editing a config-file and pushing those changes to the **default branch** of your repo.
 
-You can share this config with any other repos that employ this action to port labels from one repo to another.
-
-The action will sync repo-labels when you push an edit to the config file (`.github/labels.yaml`) to the default branch or when the `label` webhook event is triggered. You can also activate the action manually (`workflow_dispatch`) from the Actions tab.
+The action will sync repo-labels when you push an edit to the config file (default: `.github/labels.yaml`) to the main branch or when the `label` webhook event is triggered. You can also activate the action manually (`workflow_dispatch`) from the Actions tab.
 If the config file (`.github/labels.yaml`) does not exist when the action executes, it will create the file automatically and fill in the details of the labels used in your repository.
 
 ### Workflow setup
@@ -26,11 +24,16 @@ name: label-sync
 # =================
 
 on:
+  # When .github/labels.yaml changes are pushed to the default branch
   push:
     paths:
-      - .github/labels.yaml # When .github/labels.yaml changes are pushed to the default branch
-  label:  # When a label webhook event (create, update, delete) is triggered
-  workflow_dispatch:  # When a workflow event is dispatched manually
+      - .github/labels.yaml
+  
+  # When a label webhook event (create, update, delete) is triggered
+  label:
+
+  # When a workflow event is dispatched manually
+  workflow_dispatch:
 
 # Jobs
 # ====
@@ -47,10 +50,10 @@ jobs:
 
       # Required for GITHUB_WORKSPACE
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      # Execute Label Sync Action
-      # =========================
+      # Execute label-sync Action
+      # ========================
 
       - name: label-sync
         uses: Shresht7/label-sync-action@main
@@ -60,8 +63,7 @@ jobs:
         # -----------------
 
         with:
-          commit-message: Update labels 🏷 # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: label-sync Update)
-          dryrun: true    # Will not make any actual changes if true (default: true)
+          dryrun: false   # Will not make any actual changes if true (default: true)
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
           delete: false   # If true, label-sync has permissions to delete labels (default: false)
@@ -71,6 +73,17 @@ jobs:
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to make use of the GitHub API to modify labels and update .github/labels.yaml file
+
+      # Create pull-request with updated label config
+
+      - name: update-labels-config
+        id: update-labels-config
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: 'label-sync'
+          commit-message: 'Update labels 🏷'
+          title: 'Update labels 🏷'
 ```
 > NOTE: Potential changes will only be logged if dry run is `true`. For label-sync to actually modify anything you will have to set `dryrun` to `false`.
 
