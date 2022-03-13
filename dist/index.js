@@ -677,7 +677,9 @@ function syncConfigLabels() {
             repoLabels.delete(label.name);
         }
         //  YAMLify repo-labels
-        let content = yaml.dump(repoLabels.values());
+        let labels = [];
+        repoLabels.forEach((label) => labels.push(label));
+        let content = yaml.dump(labels);
         content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
         //  Log and exit if Dry-Run Mode
         if (config.isDryRun) {
