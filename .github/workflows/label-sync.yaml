@@ -45,7 +45,7 @@ jobs:
 
         with:
           commit-message: Update labels 🏷 # The commit message when label-sync updates .github/labels.yaml file in the repo (default: label-sync Update)
-          dryrun: true    # Will not make any actual changes if true (default: true)
+          dryrun: false   # Will not make any actual changes if true (default: true)
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
           delete: false   # If true, label-sync has permissions to delete labels (default: false)
