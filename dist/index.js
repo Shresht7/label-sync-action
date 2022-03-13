@@ -62,64 +62,6 @@ exports.parseConfig = parseConfig;
 
 /***/ }),
 
-/***/ 4851:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createPullRequest = void 0;
-//  Library
-const github = __importStar(__nccwpck_require__(5438));
-const library_1 = __nccwpck_require__(2172);
-function createPullRequest(path, content, message, branch = 'update-label-sync') {
-    return __awaiter(this, void 0, void 0, function* () {
-        //  Get the HEAD reference
-        const ref = yield library_1.octokit.rest.git.getRef(Object.assign(Object.assign({}, github.context.repo), { ref: `heads/${branch}` }));
-        const pr = yield library_1.octokit.rest.repos.createOrUpdateFileContents(Object.assign(Object.assign({}, github.context.repo), { content,
-            message,
-            path,
-            branch, sha: ref.data.object.sha }));
-        console.log(pr);
-    });
-}
-exports.createPullRequest = createPullRequest;
-
-
-/***/ }),
-
 /***/ 863:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -146,7 +88,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 __exportStar(__nccwpck_require__(7619), exports);
 __exportStar(__nccwpck_require__(4140), exports);
 __exportStar(__nccwpck_require__(8323), exports);
-__exportStar(__nccwpck_require__(4851), exports);
 
 
 /***/ }),
@@ -675,12 +616,12 @@ exports.syncConfigLabels = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const fs = __importStar(__nccwpck_require__(7561));
 const yaml = __importStar(__nccwpck_require__(1917));
 //  Helpers
 const config = __importStar(__nccwpck_require__(8562));
 const getConfigLabels_1 = __nccwpck_require__(6178);
 const getRepoLabels_1 = __nccwpck_require__(6927);
-const helpers_1 = __nccwpck_require__(863);
 function syncConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const repoLabelsMap = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get repo's label data
@@ -716,7 +657,27 @@ function syncConfigLabels() {
             core.info(yamlContent);
             return;
         }
-        yield (0, helpers_1.createPullRequest)(config.path, yamlContent, 'Update label-sync');
+        fs.writeFileSync(config.path, yamlContent, { encoding: 'utf-8' });
+        // //  Get .github/labels.yaml file (if it exists). For SHA
+        // let SHA
+        // if (!firstRun) {
+        //     const { data } = await octokit.rest.repos.getContent({
+        //         owner: github.context.repo.owner,
+        //         repo: github.context.repo.repo,
+        //         path: config.path
+        //     })
+        //     if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
+        //     SHA = data.sha
+        // }
+        // //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
+        // await octokit.rest.repos.createOrUpdateFileContents({
+        //     owner: github.context.repo.owner,
+        //     repo: github.context.repo.repo,
+        //     path: config.path,
+        //     message: config.commitMessage,
+        //     content: Buffer.from(yamlContent).toString('base64'),
+        //     sha: SHA
+        // })
     });
 }
 exports.syncConfigLabels = syncConfigLabels;

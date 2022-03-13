@@ -1,6 +1,7 @@
 //  Library
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import * as fs from 'node:fs'
 import { octokit } from './octokit'
 import * as yaml from 'js-yaml'
 
@@ -56,27 +57,28 @@ export async function syncConfigLabels() {
         return
     }
 
+    fs.writeFileSync(config.path, yamlContent, { encoding: 'utf-8' })
 
-    //  Get .github/labels.yaml file (if it exists). For SHA
-    let SHA
-    if (!firstRun) {
-        const { data } = await octokit.rest.repos.getContent({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            path: config.path
-        })
+    // //  Get .github/labels.yaml file (if it exists). For SHA
+    // let SHA
+    // if (!firstRun) {
+    //     const { data } = await octokit.rest.repos.getContent({
+    //         owner: github.context.repo.owner,
+    //         repo: github.context.repo.repo,
+    //         path: config.path
+    //     })
 
-        if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
-        SHA = data.sha
-    }
+    //     if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
+    //     SHA = data.sha
+    // }
 
-    //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
-    await octokit.rest.repos.createOrUpdateFileContents({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        path: config.path,
-        message: config.commitMessage,
-        content: Buffer.from(yamlContent).toString('base64'),
-        sha: SHA
-    })
+    // //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
+    // await octokit.rest.repos.createOrUpdateFileContents({
+    //     owner: github.context.repo.owner,
+    //     repo: github.context.repo.repo,
+    //     path: config.path,
+    //     message: config.commitMessage,
+    //     content: Buffer.from(yamlContent).toString('base64'),
+    //     sha: SHA
+    // })
 }
