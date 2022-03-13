@@ -2,6 +2,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { octokit } from './octokit'
 import * as yaml from 'js-yaml'
 
@@ -12,6 +13,11 @@ import { getRepoLabels } from './getRepoLabels'
 
 //  Type Definitions
 import type { GitHubLabel, LabelMap } from '../types'
+
+
+const workspace = process.env.GITHUB_WORKSPACE || ''
+const configPath = path.join(workspace, config.path)
+const extension = path.extname(config.path)
 
 export async function syncConfigLabels() {
 
@@ -57,7 +63,7 @@ export async function syncConfigLabels() {
         return
     }
 
-    fs.writeFileSync(config.path, yamlContent, { encoding: 'utf-8' })
+    fs.writeFileSync(configPath, yamlContent, { encoding: 'utf-8' })
 
     // //  Get .github/labels.yaml file (if it exists). For SHA
     // let SHA

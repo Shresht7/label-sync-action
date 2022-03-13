@@ -617,11 +617,15 @@ exports.syncConfigLabels = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const fs = __importStar(__nccwpck_require__(7561));
+const path = __importStar(__nccwpck_require__(9411));
 const yaml = __importStar(__nccwpck_require__(1917));
 //  Helpers
 const config = __importStar(__nccwpck_require__(8562));
 const getConfigLabels_1 = __nccwpck_require__(6178);
 const getRepoLabels_1 = __nccwpck_require__(6927);
+const workspace = process.env.GITHUB_WORKSPACE || '';
+const configPath = path.join(workspace, config.path);
+const extension = path.extname(config.path);
 function syncConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const repoLabelsMap = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get repo's label data
@@ -657,7 +661,7 @@ function syncConfigLabels() {
             core.info(yamlContent);
             return;
         }
-        fs.writeFileSync(config.path, yamlContent, { encoding: 'utf-8' });
+        fs.writeFileSync(configPath, yamlContent, { encoding: 'utf-8' });
         // //  Get .github/labels.yaml file (if it exists). For SHA
         // let SHA
         // if (!firstRun) {
