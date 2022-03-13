@@ -26,6 +26,3 @@ export const permissions = {
 
 /** Boolean to determine if labels should sync back to the config-file */
 export const readonly = core.getBooleanInput('readonly')
-
-/** Commit message to show */
-export const commitMessage = core.getInput('commit-message')
