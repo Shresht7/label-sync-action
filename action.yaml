@@ -6,6 +6,10 @@ name: label-sync
 author: Shresht7
 description: Create, update, and delete labels from your repository declaratively
 
+runs:
+  using: "node16"
+  main: "dist/index.js"
+
 branding:
   icon: tag
   color: white
@@ -54,11 +58,3 @@ inputs:
   commit-message:
     description: "Commit Message. Shown when label-sync updates the config-file in the repo (default: Update labels 🏷)"
     default: Update labels 🏷
-
-
-# Run
-# ===
-
-runs:
-  using: "node16"
-  main: "dist/index.js"
