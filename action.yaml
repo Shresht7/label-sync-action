@@ -45,16 +45,12 @@ inputs:
   # -------------
 
   path:
-    description: "Configuration file-path for labels (default: .github/labels.yaml)"
+    description: "Path to the file containing the label configuration (default: .github/labels.yaml)"
     default: .github/labels.yaml
 
   # Sync to File
   # ------------
 
-  readonly:
-    description: "Should not sync labels back to the config file. (default: false)"
+  create-artifact:
+    description: "Create an artifact of the updated label.yaml whenever a label is modified using the UI (default: false)"
     default: false
-
-  commit-message:
-    description: "Commit Message. Shown when label-sync updates the config-file in the repo (default: Update labels 🏷)"
-    default: Update labels 🏷

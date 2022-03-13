@@ -24,5 +24,5 @@ export const permissions = {
     delete: core.getBooleanInput('delete')
 }
 
-/** Boolean to determine if labels should sync back to the config-file */
-export const readonly = core.getBooleanInput('readonly')
+/** Boolean to determine if an artifact containing an updated labels.yaml should be created */
+export const createArtifact = core.getBooleanInput('create-artifact')

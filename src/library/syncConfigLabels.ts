@@ -2,64 +2,59 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as fs from 'node:fs'
-import * as path from 'node:path'
 import * as yaml from 'js-yaml'
 
 //  Helpers
 import * as config from '../config'
-import { getConfigLabels } from './getConfigLabels'
 import { getRepoLabels } from './getRepoLabels'
-
-//  Type Definitions
-import type { GitHubLabel, LabelMap } from '../types'
 import { createArtifacts } from './artifacts'
 
+/** Reads the repository-labels and updates the label-sync config-file */
 export async function syncConfigLabels() {
 
-    const repoLabelsMap: LabelMap = await getRepoLabels()    //  Get repo's label data
+    /** Repository's existing labels */
+    const repoLabels = await getRepoLabels()
 
-    const configLabelsMap = await getConfigLabels()
+    //  Get the webhook event action and the modified label
+    let { payload: { action, label } } = github.context
 
-    const firstRun = configLabelsMap.keys.length === 0
-
-    if (!firstRun) {
-        let { payload: { action, label } } = github.context
-
-        //  Only keep properties that are needed
-        label = {
-            name: label.name,
-            description: label.description,
-            color: label.color
-        }
-
-        if (action === 'created' && !repoLabelsMap.has(label.name)) {  //  New label created
-            repoLabelsMap.set(label.name, label)
-        } else if (action === 'updated' && repoLabelsMap.has(label.name)) {    //  Existing label updated
-            repoLabelsMap.set(label.name, label)
-        } else if (action === 'deleted' && repoLabelsMap.has(label.name)) {    //  Existing label deleted
-            repoLabelsMap.delete(label.name)
-        }
-
+    //  Only keep the label properties that are needed, discard the rest
+    label = {
+        name: label.name,
+        description: label.description,
+        color: label.color
     }
 
-    //  Create array
-    let repoLabels: GitHubLabel[] = []
-    repoLabelsMap.forEach(label => repoLabels.push(label))
+    //  Modify repo-labels depending on what changed
+    if (action === 'created' && !repoLabels.has(label.name)) {  //  New label created
+        repoLabels.set(label.name, label)
+    } else if (action === 'updated' && repoLabels.has(label.name)) {    //  Existing label updated
+        repoLabels.set(label.name, label)
+    } else if (action === 'deleted' && repoLabels.has(label.name)) {    //  Existing label deleted
+        repoLabels.delete(label.name)
+    }
 
-    //  YAMLify
-    let yamlContent = yaml.dump(repoLabels)
-    yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '$1')   //  Add additional \n for clarity sake
-
+    //  YAMLify repo-labels
+    let content = yaml.dump(repoLabels.values())
+    content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart()   //  Add additional \n for clarity sake
 
     //  Log and exit if Dry-Run Mode
     if (config.isDryRun) {
-        core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
-        core.info(yamlContent)
+        core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
+        core.info(content)
+        if (config.createArtifact) {
+            core.info('Creating artifacts')
+        }
         return
     }
 
-    fs.writeFileSync(config.workspacePath, yamlContent, { encoding: 'utf-8' })
+    //  Write yaml configuration to the workspace
+    fs.writeFileSync(config.workspacePath, content, { encoding: 'utf-8' })
 
-    createArtifacts('labels', [`./${config.path}`])
+    //  Generate artifacts of the updated label config
+    if (config.createArtifact) {
+        createArtifacts('labels', [`./${config.path}`])
+        core.notice(`Created artifacts containing ${config.path}`)
+    }
 
 }

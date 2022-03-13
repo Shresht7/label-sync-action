@@ -11,7 +11,7 @@ import * as config from './config'
 /** Label-Sync-Action */
 async function labelSync() {
 
-    if (github.context.eventName === 'label' && !config.readonly) {     //  If the action was triggered by the label webhook event
+    if (github.context.eventName === 'label') {     //  If the action was triggered by the label webhook event
 
         core.info(`Synchronizing labels from your repository to ${config.path}`)
         await syncConfigLabels()
