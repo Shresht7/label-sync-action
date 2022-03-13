@@ -61,12 +61,12 @@ export async function createPullRequest(path: string, content: string, message: 
     const pr = await octokit.rest.pulls.create({
         ...github.context.repo,
         title: message,
-        body: '',
+        body: 'Update Labels',
         head: branch,
         base: 'main'
     })
 
-    console.log('Created PR', pr)
+    console.log('Created PR', await pr)
 
     return pr
 }

@@ -124,8 +124,8 @@ function createPullRequest(path, content, message, branch = 'label-sync') {
         console.log('Created commit', newCommit);
         yield library_1.octokit.rest.git.createRef(Object.assign(Object.assign({}, github.context.repo), { ref: `refs/heads/${branch}`, sha: newCommit.data.sha }));
         console.log('Created commit', newCommit);
-        const pr = yield library_1.octokit.rest.pulls.create(Object.assign(Object.assign({}, github.context.repo), { title: message, body: '', head: branch, base: 'main' }));
-        console.log('Created PR', pr);
+        const pr = yield library_1.octokit.rest.pulls.create(Object.assign(Object.assign({}, github.context.repo), { title: message, body: 'Update Labels', head: branch, base: 'main' }));
+        console.log('Created PR', yield pr);
         return pr;
     });
 }

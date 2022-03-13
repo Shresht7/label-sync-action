@@ -49,6 +49,7 @@ jobs:
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
           delete: false   # If true, label-sync has permissions to delete labels (default: false)
+          path: labels.yaml
 
         # Environment Variables
         # ---------------------
