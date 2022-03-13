@@ -106,7 +106,7 @@ The config file (`.github/labels.yaml`) will look something like this:
 
 ```
 
-> NOTE: Wrap colors with quotation marks (like '#ffffff') or yaml will think anything following the `#` is a comment.
+> NOTE: If you're prefixing colors with a `#` then wrap them with quotation marks (like '#ffffff') or yaml will think anything following the `#` is a comment.
 
 ## Permissions
 
