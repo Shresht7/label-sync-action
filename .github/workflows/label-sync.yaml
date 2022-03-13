@@ -58,10 +58,9 @@ jobs:
 
       - name: update-labels
         id: update-labels
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -b update-labels
-          git add .
-          git commit -m 'Do stuff'
-          git push --set-upstream origin update-labels
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Update labels 🏷'
+          title: 'Update labels 🏷'
+          branch: 'label-sync'

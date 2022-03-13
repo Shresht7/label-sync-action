@@ -1,6 +1,61 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 88:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createArtifact = exports.permissions = exports.workspacePath = exports.path = exports.isDryRun = void 0;
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const nodePath = __importStar(__nccwpck_require__(9411));
+const workspace = process.env.GITHUB_WORKSPACE || '';
+//  ======
+//  CONFIG
+//  ======
+/** Boolean to determine if this is a dry-run */
+exports.isDryRun = core.getBooleanInput('dryrun');
+/** Config file-path (default: '.github/labels.yaml') */
+exports.path = core.getInput('path');
+/** Config file-path in the workspace */
+exports.workspacePath = nodePath.join(workspace, exports.path);
+/** Permissions */
+exports.permissions = {
+    create: core.getBooleanInput('create'),
+    update: core.getBooleanInput('update'),
+    delete: core.getBooleanInput('delete')
+};
+/** Boolean to determine if an artifact containing an updated labels.yaml should be created */
+exports.createArtifact = core.getBooleanInput('create-artifact');
+
+
+/***/ }),
+
 /***/ 8323:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -54,6 +109,9 @@ function parseConfig(contents, ext = 'yml') {
     }
     else {
         throw new Error('Incompatible config format. Please provide a `yaml` or `json` file.');
+    }
+    if (!Array.isArray(result)) {
+        throw new Error('Config is not an array!');
     }
     return result;
 }
@@ -206,11 +264,12 @@ const labelSync_1 = __importDefault(__nccwpck_require__(9342));
 //  ====
 //  MAIN
 //  ====
+/** Main entrypoint to the GitHub Action */
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield (0, labelSync_1.default)();
-            core.info('Synchronization Complete!');
+            core.notice('🏷 Synchronization Complete! ✅');
         }
         catch (err) {
             const error = err;
@@ -265,19 +324,19 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const library_1 = __nccwpck_require__(2172);
-const library_2 = __nccwpck_require__(2172);
+const config = __importStar(__nccwpck_require__(88));
 //  ==========
 //  LABEL SYNC
 //  ==========
 /** Label-Sync-Action */
 function labelSync() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (github.context.eventName === 'label' && !library_2.config.readonly) { //  If the action was triggered by the label webhook event
-            core.notice(`Synchronizing labels from your repository to ${library_2.config.path}`);
+        if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
+            core.info(`Synchronizing labels from your repository to ${config.path}`);
             yield (0, library_1.syncConfigLabels)();
         }
         else { //  If the action was triggered on push or manually by workflow dispatch
-            core.notice(`Synchronizing labels from ${library_2.config.path} to your repository`);
+            core.info(`Synchronizing labels from ${config.path} to your repository`);
             yield (0, library_1.syncRepoLabels)();
         }
     });
@@ -331,59 +390,6 @@ exports.createArtifacts = createArtifacts;
 
 /***/ }),
 
-/***/ 8562:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commitMessage = exports.readonly = exports.permissions = exports.path = exports.isDryRun = void 0;
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-//  ======
-//  CONFIG
-//  ======
-/** Boolean to determine if this is a dry-run */
-exports.isDryRun = core.getBooleanInput('dryrun') || false;
-/** Config file path (default: '.github/labels.yaml') */
-exports.path = core.getInput('path');
-/** Permissions */
-exports.permissions = {
-    create: core.getBooleanInput('create'),
-    update: core.getBooleanInput('update'),
-    delete: core.getBooleanInput('delete')
-};
-/** Boolean to determine if labels should sync back to the config-file */
-exports.readonly = core.getBooleanInput('readonly');
-/** Commit message to show */
-exports.commitMessage = core.getInput('commit-message', { required: true });
-
-
-/***/ }),
-
 /***/ 6178:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -425,17 +431,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getConfigLabels = void 0;
 //  Library
 const path = __importStar(__nccwpck_require__(9411));
-const config = __importStar(__nccwpck_require__(8562));
+const config = __importStar(__nccwpck_require__(88));
 //  Helpers
 const helpers_1 = __nccwpck_require__(863);
-const workspace = process.env.GITHUB_WORKSPACE || '';
-const configPath = path.join(workspace, config.path);
-const extension = path.extname(config.path);
 /** Reads labels from the config-file and generates a LabelMap */
 function getConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const configLabels = new Map();
-        const contents = yield (0, helpers_1.readConfigFile)(configPath);
+        const contents = yield (0, helpers_1.readConfigFile)(config.workspacePath);
+        const extension = path.extname(config.path);
         (0, helpers_1.parseConfig)(contents, extension)
             .forEach(label => configLabels.set(label.name, label));
         return configLabels;
@@ -543,25 +547,11 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.config = void 0;
 __exportStar(__nccwpck_require__(3791), exports);
-exports.config = __importStar(__nccwpck_require__(8562));
 __exportStar(__nccwpck_require__(8095), exports);
 __exportStar(__nccwpck_require__(18), exports);
 
@@ -599,7 +589,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.octokit = void 0;
 //  Library
-const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 //  =======
 //  OCTOKIT
@@ -607,7 +596,7 @@ const github = __importStar(__nccwpck_require__(5438));
 /** GitHub Token */
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 if (!GITHUB_TOKEN) {
-    core.error('Invalid GITHUB_TOKEN');
+    throw new Error('Invalid GITHUB_TOKEN');
 }
 //  --------------------------------------------------
 exports.octokit = github.getOctokit(GITHUB_TOKEN);
@@ -659,73 +648,53 @@ exports.syncConfigLabels = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const fs = __importStar(__nccwpck_require__(7561));
-const path = __importStar(__nccwpck_require__(9411));
 const yaml = __importStar(__nccwpck_require__(1917));
 //  Helpers
-const config = __importStar(__nccwpck_require__(8562));
-const getConfigLabels_1 = __nccwpck_require__(6178);
+const config = __importStar(__nccwpck_require__(88));
 const getRepoLabels_1 = __nccwpck_require__(6927);
 const artifacts_1 = __nccwpck_require__(1764);
-const workspace = process.env.GITHUB_WORKSPACE || '';
-const configPath = path.join(workspace, config.path);
-const extension = path.extname(config.path);
+/** Reads the repository-labels and updates the label-sync config-file */
 function syncConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
-        const repoLabelsMap = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get repo's label data
-        const configLabelsMap = yield (0, getConfigLabels_1.getConfigLabels)();
-        const firstRun = configLabelsMap.keys.length === 0;
-        if (!firstRun) {
-            let { payload: { action, label } } = github.context;
-            //  Only keep properties that are needed
-            label = {
-                name: label.name,
-                description: label.description,
-                color: label.color
-            };
-            if (action === 'created' && !repoLabelsMap.has(label.name)) { //  New label created
-                repoLabelsMap.set(label.name, label);
-            }
-            else if (action === 'updated' && repoLabelsMap.has(label.name)) { //  Existing label updated
-                repoLabelsMap.set(label.name, label);
-            }
-            else if (action === 'deleted' && repoLabelsMap.has(label.name)) { //  Existing label deleted
-                repoLabelsMap.delete(label.name);
-            }
+        /** Repository's existing labels */
+        const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)();
+        //  Get the webhook event action and the modified label
+        let { payload: { action, label } } = github.context;
+        //  Only keep the label properties that are needed, discard the rest
+        label = {
+            name: label.name,
+            description: label.description,
+            color: label.color
+        };
+        //  Modify repo-labels depending on what changed
+        if (action === 'created' && !repoLabels.has(label.name)) { //  New label created
+            repoLabels.set(label.name, label);
         }
-        //  Create array
-        let repoLabels = [];
-        repoLabelsMap.forEach(label => repoLabels.push(label));
-        //  YAMLify
-        let yamlContent = yaml.dump(repoLabels);
-        yamlContent = yamlContent.replace(/(\s+-\s+\w+:.*)/g, '$1'); //  Add additional \n for clarity sake
+        else if (action === 'updated' && repoLabels.has(label.name)) { //  Existing label updated
+            repoLabels.set(label.name, label);
+        }
+        else if (action === 'deleted' && repoLabels.has(label.name)) { //  Existing label deleted
+            repoLabels.delete(label.name);
+        }
+        //  YAMLify repo-labels
+        let content = yaml.dump(repoLabels.values());
+        content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
         //  Log and exit if Dry-Run Mode
         if (config.isDryRun) {
-            core.info('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
-            core.info(yamlContent);
+            core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
+            core.info(content);
+            if (config.createArtifact) {
+                core.info('Creating artifacts');
+            }
             return;
         }
-        fs.writeFileSync(configPath, yamlContent, { encoding: 'utf-8' });
-        (0, artifacts_1.createArtifacts)('labels', [`./${config.path}`]);
-        // //  Get .github/labels.yaml file (if it exists). For SHA
-        // let SHA
-        // if (!firstRun) {
-        //     const { data } = await octokit.rest.repos.getContent({
-        //         owner: github.context.repo.owner,
-        //         repo: github.context.repo.repo,
-        //         path: config.path
-        //     })
-        //     if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
-        //     SHA = data.sha
-        // }
-        // //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
-        // await octokit.rest.repos.createOrUpdateFileContents({
-        //     owner: github.context.repo.owner,
-        //     repo: github.context.repo.repo,
-        //     path: config.path,
-        //     message: config.commitMessage,
-        //     content: Buffer.from(yamlContent).toString('base64'),
-        //     sha: SHA
-        // })
+        //  Write yaml configuration to the workspace
+        fs.writeFileSync(config.workspacePath, content, { encoding: 'utf-8' });
+        //  Generate artifacts of the updated label config
+        if (config.createArtifact) {
+            (0, artifacts_1.createArtifacts)('labels', [`./${config.path}`]);
+            core.notice(`Created artifacts containing ${config.path}`);
+        }
     });
 }
 exports.syncConfigLabels = syncConfigLabels;
@@ -775,7 +744,7 @@ exports.syncRepoLabels = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const config = __importStar(__nccwpck_require__(8562));
+const config = __importStar(__nccwpck_require__(88));
 const octokit_1 = __nccwpck_require__(3791);
 //  Helpers
 const getConfigLabels_1 = __nccwpck_require__(6178);
@@ -8955,7 +8924,7 @@ function renamed(from, to) {
 
 module.exports.Type = __nccwpck_require__(6073);
 module.exports.Schema = __nccwpck_require__(1082);
-module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(4607);
+module.exports.FAILSAFE_SCHEMA = __nccwpck_require__(8562);
 module.exports.JSON_SCHEMA = __nccwpck_require__(1035);
 module.exports.CORE_SCHEMA = __nccwpck_require__(2011);
 module.exports.DEFAULT_SCHEMA = __nccwpck_require__(8759);
@@ -12005,7 +11974,7 @@ module.exports = (__nccwpck_require__(2011).extend)({
 
 /***/ }),
 
-/***/ 4607:
+/***/ 8562:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -12045,7 +12014,7 @@ module.exports = new Schema({
 
 
 
-module.exports = (__nccwpck_require__(4607).extend)({
+module.exports = (__nccwpck_require__(8562).extend)({
   implicit: [
     __nccwpck_require__(721),
     __nccwpck_require__(4993),
