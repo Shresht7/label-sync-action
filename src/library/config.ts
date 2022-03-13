@@ -18,5 +18,8 @@ export const permissions = {
     delete: core.getBooleanInput('delete')
 }
 
+/** Boolean to determine if labels should sync back to the config-file */
+export const readonly = core.getBooleanInput('readonly')
+
 /** Commit message to show */
 export const commitMessage = core.getInput('commit-message', { required: true })
