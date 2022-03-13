@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 
 //  Helpers
-import * as config from '../config'
+import { config, workspacePath, isDryRun, createArtifact } from '../config'
 import { getRepoLabels } from './getRepoLabels'
 import { createArtifacts } from './artifacts'
 
@@ -44,22 +44,22 @@ export async function syncConfigLabels() {
     content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart()   //  Add additional \n for clarity sake
 
     //  Log and exit if Dry-Run Mode
-    if (config.isDryRun) {
+    if (isDryRun) {
         core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
         core.info(content)
-        if (config.createArtifact) {
+        if (createArtifact) {
             core.info('Creating artifacts')
         }
         return
     }
 
     //  Write yaml configuration to the workspace
-    fs.writeFileSync(config.workspacePath, content, { encoding: 'utf-8' })
+    fs.writeFileSync(workspacePath, content, { encoding: 'utf-8' })
 
     //  Generate artifacts of the updated label config
-    if (config.createArtifact) {
-        createArtifacts('labels', [`./${config.path}`])
-        core.notice(`Created artifacts containing ${config.path}`)
+    if (createArtifact) {
+        createArtifacts('labels', [`./${config}`])
+        core.notice(`Created artifacts containing ${config}`)
     }
 
 }

@@ -44,7 +44,7 @@ inputs:
   # Labels Config
   # -------------
 
-  path:
+  config:
     description: "Path to the file containing the label configuration (default: .github/labels.yaml)"
     default: .github/labels.yaml
 

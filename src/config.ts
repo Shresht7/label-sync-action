@@ -1,6 +1,6 @@
 //  Library
 import * as core from '@actions/core'
-import * as nodePath from 'node:path'
+import * as path from 'node:path'
 
 const workspace = process.env.GITHUB_WORKSPACE || ''
 
@@ -12,10 +12,10 @@ const workspace = process.env.GITHUB_WORKSPACE || ''
 export const isDryRun = core.getBooleanInput('dryrun')
 
 /** Config file-path (default: '.github/labels.yaml') */
-export const path = core.getInput('path')
+export const config = core.getInput('config')
 
 /** Config file-path in the workspace */
-export const workspacePath = nodePath.join(workspace, path)
+export const workspacePath = path.join(workspace, config)
 
 /** Permissions */
 export const permissions = {

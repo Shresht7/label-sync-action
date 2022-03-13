@@ -30,10 +30,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createArtifact = exports.permissions = exports.workspacePath = exports.path = exports.isDryRun = void 0;
+exports.createArtifact = exports.permissions = exports.workspacePath = exports.config = exports.isDryRun = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
-const nodePath = __importStar(__nccwpck_require__(9411));
+const path = __importStar(__nccwpck_require__(9411));
 const workspace = process.env.GITHUB_WORKSPACE || '';
 //  ======
 //  CONFIG
@@ -41,9 +41,9 @@ const workspace = process.env.GITHUB_WORKSPACE || '';
 /** Boolean to determine if this is a dry-run */
 exports.isDryRun = core.getBooleanInput('dryrun');
 /** Config file-path (default: '.github/labels.yaml') */
-exports.path = core.getInput('path');
+exports.config = core.getInput('config');
 /** Config file-path in the workspace */
-exports.workspacePath = nodePath.join(workspace, exports.path);
+exports.workspacePath = path.join(workspace, exports.config);
 /** Permissions */
 exports.permissions = {
     create: core.getBooleanInput('create'),
@@ -324,7 +324,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const library_1 = __nccwpck_require__(2172);
-const config = __importStar(__nccwpck_require__(88));
+const config_1 = __nccwpck_require__(88);
 //  ==========
 //  LABEL SYNC
 //  ==========
@@ -332,11 +332,11 @@ const config = __importStar(__nccwpck_require__(88));
 function labelSync() {
     return __awaiter(this, void 0, void 0, function* () {
         if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
-            core.info(`Synchronizing labels from your repository to ${config.path}`);
+            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
             yield (0, library_1.syncConfigLabels)();
         }
         else { //  If the action was triggered on push or manually by workflow dispatch
-            core.info(`Synchronizing labels from ${config.path} to your repository`);
+            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
             yield (0, library_1.syncRepoLabels)();
         }
     });
@@ -431,15 +431,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getConfigLabels = void 0;
 //  Library
 const path = __importStar(__nccwpck_require__(9411));
-const config = __importStar(__nccwpck_require__(88));
+const config_1 = __nccwpck_require__(88);
 //  Helpers
 const helpers_1 = __nccwpck_require__(863);
 /** Reads labels from the config-file and generates a LabelMap */
 function getConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const configLabels = new Map();
-        const contents = yield (0, helpers_1.readConfigFile)(config.workspacePath);
-        const extension = path.extname(config.path);
+        const contents = yield (0, helpers_1.readConfigFile)(config_1.workspacePath);
+        const extension = path.extname(config_1.config);
         (0, helpers_1.parseConfig)(contents, extension)
             .forEach(label => configLabels.set(label.name, label));
         return configLabels;
@@ -650,7 +650,7 @@ const github = __importStar(__nccwpck_require__(5438));
 const fs = __importStar(__nccwpck_require__(7561));
 const yaml = __importStar(__nccwpck_require__(1917));
 //  Helpers
-const config = __importStar(__nccwpck_require__(88));
+const config_1 = __nccwpck_require__(88);
 const getRepoLabels_1 = __nccwpck_require__(6927);
 const artifacts_1 = __nccwpck_require__(1764);
 /** Reads the repository-labels and updates the label-sync config-file */
@@ -682,20 +682,20 @@ function syncConfigLabels() {
         let content = yaml.dump(labels);
         content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
         //  Log and exit if Dry-Run Mode
-        if (config.isDryRun) {
+        if (config_1.isDryRun) {
             core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
             core.info(content);
-            if (config.createArtifact) {
+            if (config_1.createArtifact) {
                 core.info('Creating artifacts');
             }
             return;
         }
         //  Write yaml configuration to the workspace
-        fs.writeFileSync(config.workspacePath, content, { encoding: 'utf-8' });
+        fs.writeFileSync(config_1.workspacePath, content, { encoding: 'utf-8' });
         //  Generate artifacts of the updated label config
-        if (config.createArtifact) {
-            (0, artifacts_1.createArtifacts)('labels', [`./${config.path}`]);
-            core.notice(`Created artifacts containing ${config.path}`);
+        if (config_1.createArtifact) {
+            (0, artifacts_1.createArtifacts)('labels', [`./${config_1.config}`]);
+            core.notice(`Created artifacts containing ${config_1.config}`);
         }
     });
 }
