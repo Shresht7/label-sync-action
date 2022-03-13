@@ -104,29 +104,15 @@ exports.createPullRequest = void 0;
 //  Library
 const github = __importStar(__nccwpck_require__(5438));
 const library_1 = __nccwpck_require__(2172);
-function createPullRequest(path, content, message, branch = 'label-sync') {
+function createPullRequest(path, content, message, branch = 'update-label-sync') {
     return __awaiter(this, void 0, void 0, function* () {
         //  Get the HEAD reference
         const ref = yield library_1.octokit.rest.git.getRef(Object.assign(Object.assign({}, github.context.repo), { ref: `heads/${branch}` }));
-        console.log('Got reference', ref);
-        const tree = yield library_1.octokit.rest.git.getTree(Object.assign(Object.assign({}, github.context.repo), { tree_sha: ref.data.object.sha }));
-        console.log('Got tree', tree);
-        const blob = yield library_1.octokit.rest.git.createBlob(Object.assign(Object.assign({}, github.context.repo), { content, encoding: 'utf-8' }));
-        console.log('Created blob', blob);
-        const newTree = yield library_1.octokit.rest.git.createTree(Object.assign(Object.assign({}, github.context.repo), { tree: [{
-                    path,
-                    sha: blob.data.sha,
-                    mode: '100644',
-                    type: 'blob'
-                }], base_tree: tree.data.sha }));
-        console.log('Created tree', newTree);
-        const newCommit = yield library_1.octokit.rest.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message, parents: [ref.data.object.sha], tree: newTree.data.sha }));
-        console.log('Created commit', newCommit);
-        yield library_1.octokit.rest.git.createRef(Object.assign(Object.assign({}, github.context.repo), { ref: `refs/heads/${branch}`, sha: newCommit.data.sha }));
-        console.log('Created commit', newCommit);
-        const pr = yield library_1.octokit.rest.pulls.create(Object.assign(Object.assign({}, github.context.repo), { title: message, body: 'Update Labels', head: branch, base: 'main' }));
-        console.log('Created PR', yield pr);
-        return pr;
+        const pr = yield library_1.octokit.rest.repos.createOrUpdateFileContents(Object.assign(Object.assign({}, github.context.repo), { content,
+            message,
+            path,
+            branch, sha: ref.data.object.sha }));
+        console.log(pr);
     });
 }
 exports.createPullRequest = createPullRequest;
