@@ -2,7 +2,7 @@
 import * as github from '@actions/github'
 import { octokit } from '../library'
 
-export async function createPullRequest(path: string, content: string, message: string, branch: string = 'main') {
+export async function createPullRequest(path: string, content: string, message: string, branch: string = 'label-sync') {
 
 
     //  Get the HEAD reference

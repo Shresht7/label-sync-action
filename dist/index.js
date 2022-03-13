@@ -104,7 +104,7 @@ exports.createPullRequest = void 0;
 //  Library
 const github = __importStar(__nccwpck_require__(5438));
 const library_1 = __nccwpck_require__(2172);
-function createPullRequest(path, content, message, branch = 'main') {
+function createPullRequest(path, content, message, branch = 'label-sync') {
     return __awaiter(this, void 0, void 0, function* () {
         //  Get the HEAD reference
         const ref = yield library_1.octokit.rest.git.getRef(Object.assign(Object.assign({}, github.context.repo), { ref: `heads/${branch}` }));
