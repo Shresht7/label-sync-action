@@ -60,7 +60,7 @@ jobs:
         # -----------------
 
         with:
-          commitmessage: Update labels 🏷 # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: label-sync Update)
+          commit-message: Update labels 🏷 # The commit message when SynLabel updates .github/labels.yaml file in the repo (default: label-sync Update)
           dryrun: true    # Will not make any actual changes if true (default: true)
           create: true    # If true, label-sync has permissions to create labels (default: true)
           update: true    # If true, label-sync has permissions to update labels (default: true)
