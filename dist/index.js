@@ -34,24 +34,27 @@ exports.createArtifact = exports.permissions = exports.workspacePath = exports.c
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
 const path = __importStar(__nccwpck_require__(9411));
-const workspace = process.env.GITHUB_WORKSPACE || '';
+if (!process.env.GITHUB_WORKSPACE) {
+    core.error("Could not find GITHUB_WORKSPACE environment variable. You need to use actions/checkout@v3 action for this action to have access to the repository's workspace");
+    process.exit(1);
+}
 //  ======
 //  CONFIG
 //  ======
 /** Boolean to determine if this is a dry-run */
 exports.isDryRun = core.getBooleanInput('dryrun');
-/** Config file-path (default: '.github/labels.yaml') */
+/** Config file path (default: '.github/labels.yaml') */
 exports.config = core.getInput('config');
-/** Config file-path in the workspace */
-exports.workspacePath = path.join(workspace, exports.config);
+/** Config file path in the workspace */
+exports.workspacePath = path.join(process.env.GITHUB_WORKSPACE, exports.config);
 /** Permissions */
 exports.permissions = {
     create: core.getBooleanInput('create'),
     update: core.getBooleanInput('update'),
     delete: core.getBooleanInput('delete')
 };
-/** Boolean to determine if an artifact containing an updated labels.yaml should be created */
-exports.createArtifact = core.getBooleanInput('create-artifact');
+/** Boolean to determine if an artifact containing an updated labels config should be created */
+exports.createArtifact = core.getBooleanInput('artifact');
 
 
 /***/ }),
@@ -93,7 +96,7 @@ exports.parseConfig = exports.readConfigFile = void 0;
 const fs = __importStar(__nccwpck_require__(7561));
 const yaml = __importStar(__nccwpck_require__(1917));
 const is_url_superb_1 = __importDefault(__nccwpck_require__(7548));
-/** Read Config File from given path/url */
+/** Read config file from given path or url */
 const readConfigFile = (path) => (0, is_url_superb_1.default)(path)
     ? fetch(path).then(res => res.text())
     : fs.promises.readFile(path, { encoding: 'utf-8' });
@@ -178,6 +181,7 @@ function labelSorter(existingLabels, configLabels) {
     });
     //  Delete labels
     existingLabels.forEach((_label, labelName) => {
+        //  if existing label doesn't exist in the config, delete it
         if (!configLabels.has(labelName)) {
             deleteLabels.push(labelName);
         }
@@ -335,7 +339,7 @@ function labelSync() {
             core.info(`Synchronizing labels from your repository to ${config_1.config}`);
             yield (0, library_1.syncConfigLabels)();
         }
-        else { //  If the action was triggered on push or manually by workflow dispatch
+        else { //  If the action was triggered on push or manually by workflow dispatch or any other means
             core.info(`Synchronizing labels from ${config_1.config} to your repository`);
             yield (0, library_1.syncRepoLabels)();
         }
@@ -497,8 +501,8 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRepoLabels = void 0;
 //  Library
-const octokit_1 = __nccwpck_require__(3791);
 const github = __importStar(__nccwpck_require__(5438));
+const octokit_1 = __nccwpck_require__(3791);
 /** Returns a list of all labels in the current repository */
 function getRepoLabels() {
     var e_1, _a;
@@ -660,6 +664,7 @@ function syncConfigLabels() {
         const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)();
         //  Get the webhook event action and the modified label
         let { payload: { action, label } } = github.context;
+        core.info(`label ${label.name} ${action}`);
         //  Only keep the label properties that are needed, discard the rest
         label = {
             name: label.name,
