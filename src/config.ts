@@ -11,10 +11,10 @@ const workspace = process.env.GITHUB_WORKSPACE || ''
 /** Boolean to determine if this is a dry-run */
 export const isDryRun = core.getBooleanInput('dryrun')
 
-/** Config file-path (default: '.github/labels.yaml') */
+/** Config file path (default: '.github/labels.yaml') */
 export const config = core.getInput('config')
 
-/** Config file-path in the workspace */
+/** Config file path in the workspace */
 export const workspacePath = path.join(workspace, config)
 
 /** Permissions */
@@ -24,5 +24,5 @@ export const permissions = {
     delete: core.getBooleanInput('delete')
 }
 
-/** Boolean to determine if an artifact containing an updated labels.yaml should be created */
-export const createArtifact = core.getBooleanInput('create-artifact')
+/** Boolean to determine if an artifact containing an updated labels config should be created */
+export const createArtifact = core.getBooleanInput('artifact')

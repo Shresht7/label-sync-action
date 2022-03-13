@@ -16,7 +16,7 @@ async function labelSync() {
         core.info(`Synchronizing labels from your repository to ${config}`)
         await syncConfigLabels()
 
-    } else {    //  If the action was triggered on push or manually by workflow dispatch
+    } else {    //  If the action was triggered on push or manually by workflow dispatch or any other means
 
         core.info(`Synchronizing labels from ${config} to your repository`)
         await syncRepoLabels()
