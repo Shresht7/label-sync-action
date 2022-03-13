@@ -1,7 +1,7 @@
 //  Library
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as config from './config'
+import * as config from '../config'
 import { octokit } from './octokit'
 
 //  Helpers

@@ -7,7 +7,7 @@ import { octokit } from './octokit'
 import * as yaml from 'js-yaml'
 
 //  Helpers
-import * as config from './config'
+import * as config from '../config'
 import { getConfigLabels } from './getConfigLabels'
 import { getRepoLabels } from './getRepoLabels'
 

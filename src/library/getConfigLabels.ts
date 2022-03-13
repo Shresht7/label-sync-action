@@ -1,6 +1,6 @@
 //  Library
 import * as path from 'node:path'
-import * as config from './config'
+import * as config from '../config'
 
 //  Helpers
 import { readConfigFile, parseConfig } from '../helpers'
