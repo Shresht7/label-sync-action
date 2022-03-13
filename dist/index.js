@@ -125,15 +125,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -144,19 +135,9 @@ const labelSync_1 = __importDefault(__nccwpck_require__(9342));
 //  ====
 //  MAIN
 //  ====
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield (0, labelSync_1.default)();
-        }
-        catch (err) {
-            const error = err;
-            core.setFailed(error);
-            process.exit(1);
-        }
-    });
-}
-run();
+(0, labelSync_1.default)()
+    .then(() => core.info('Synchronization Complete!'))
+    .catch(error => core.setFailed(error));
 
 
 /***/ }),
@@ -203,20 +184,20 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const library_1 = __nccwpck_require__(2172);
+const library_2 = __nccwpck_require__(2172);
 //  ==========
 //  LABEL SYNC
 //  ==========
+/** Label-Sync-Action */
 function labelSync() {
     return __awaiter(this, void 0, void 0, function* () {
         if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
-            core.info('Synchronizing labels from your repository to `.github/labels.yaml`');
+            core.info(`Synchronizing labels from your repository to ${library_2.config.path}`);
             yield (0, library_1.syncConfigLabels)();
-            core.info('Success');
         }
         else { //  If the action was triggered on push or manually by workflow dispatch
-            core.info('Synchronizing labels from `.github/labels.yaml` to your repository');
+            core.info(`Synchronizing labels from ${library_2.config.path} to your repository`);
             yield (0, library_1.syncRepoLabels)();
-            core.info('Success');
         }
     });
 }
@@ -256,21 +237,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commitMessage = exports.permissions = exports.pathURL = exports.path = exports.fileName = exports.isDryRun = void 0;
+exports.commitMessage = exports.permissions = exports.path = exports.isDryRun = void 0;
 //  Library
-const nodePath = __importStar(__nccwpck_require__(9411));
 const core = __importStar(__nccwpck_require__(2186));
 //  ======
 //  CONFIG
 //  ======
+/** Boolean to determine if this is a dry-run */
 exports.isDryRun = core.getBooleanInput('dryrun') || false;
-const workspaceURL = process.env.GITHUB_WORKSPACE || '';
-/** Name of config file  */
-exports.fileName = 'labels.yaml'; //  .github/labels.yaml
-/** Path to config file */
-exports.path = nodePath.join('.github', exports.fileName);
-/** Path URL */
-exports.pathURL = nodePath.join(workspaceURL, exports.path);
+/** Config file path (default: '.github/labels.yaml') */
+exports.path = core.getInput('path');
 /** Permissions */
 exports.permissions = {
     create: core.getBooleanInput('create'),
@@ -278,7 +254,7 @@ exports.permissions = {
     delete: core.getBooleanInput('delete')
 };
 /** Commit message to show */
-exports.commitMessage = core.getInput('commitmessage', { required: true });
+exports.commitMessage = core.getInput('commit-message', { required: true });
 
 
 /***/ }),
@@ -324,15 +300,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getConfigLabels = void 0;
 //  Library
 const fs = __importStar(__nccwpck_require__(7561));
+const path = __importStar(__nccwpck_require__(9411));
 const yaml = __importStar(__nccwpck_require__(1917));
 const config = __importStar(__nccwpck_require__(8562));
+const workspace = process.env.GITHUB_WORKSPACE || '';
+const configPath = path.join(workspace, config.path);
 /** Reads labels from '.github/labels.yaml  file and returns a LabelMap */
 function getConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         //  Read config file from directory
-        const file = yield fs.promises.readFile(config.pathURL, { encoding: 'utf-8' })
-            .then(res => res)
-            .catch(_ => "");
+        const file = yield fs.promises.readFile(configPath, { encoding: 'utf-8' }).catch(_ => "");
         const configLabels = new Map();
         const labels = yaml.load(file);
         labels.forEach(label => configLabels.set(label.name, label));
@@ -441,10 +418,24 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.config = void 0;
+exports.config = __importStar(__nccwpck_require__(8562));
 __exportStar(__nccwpck_require__(8095), exports);
 __exportStar(__nccwpck_require__(18), exports);
 
@@ -490,7 +481,7 @@ const github = __importStar(__nccwpck_require__(5438));
 /** GitHub Token */
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 if (!GITHUB_TOKEN) {
-    core.setFailed('Invalid GITHUB_TOKEN');
+    core.error('Invalid GITHUB_TOKEN');
 }
 //  --------------------------------------------------
 exports.octokit = github.getOctokit(GITHUB_TOKEN);
@@ -539,21 +530,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.syncConfigLabels = void 0;
 //  Library
-const fs = __importStar(__nccwpck_require__(7561));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const config = __importStar(__nccwpck_require__(8562));
-const yaml = __importStar(__nccwpck_require__(1917));
 const octokit_1 = __nccwpck_require__(3791);
+const yaml = __importStar(__nccwpck_require__(1917));
 //  Helpers
+const config = __importStar(__nccwpck_require__(8562));
+const getConfigLabels_1 = __nccwpck_require__(6178);
 const getRepoLabels_1 = __nccwpck_require__(6927);
 function syncConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const repoLabelsMap = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get repo's label data
-        const fileContent = yield fs.promises.readFile(config.pathURL, { encoding: 'utf-8' })
-            .then(res => res)
-            .catch(_ => '');
-        const firstRun = fileContent === '';
+        const configLabelsMap = yield (0, getConfigLabels_1.getConfigLabels)();
+        const firstRun = configLabelsMap.keys.length === 0;
         if (!firstRun) {
             let { payload: { action, label } } = github.context;
             //  Only keep properties that are needed
