@@ -20,5 +20,7 @@ export function parseConfig<T extends any[]>(contents: string, ext: string = 'ym
         throw new Error('Incompatible config format. Please provide a `yaml` or `json` file.')
     }
 
+    if (!Array.isArray(result)) { throw new Error('Config is not an array!') }
+
     return result
 }

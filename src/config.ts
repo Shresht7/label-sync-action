@@ -1,15 +1,21 @@
 //  Library
 import * as core from '@actions/core'
+import * as nodePath from 'node:path'
+
+const workspace = process.env.GITHUB_WORKSPACE || ''
 
 //  ======
 //  CONFIG
 //  ======
 
 /** Boolean to determine if this is a dry-run */
-export const isDryRun = core.getBooleanInput('dryrun') || false
+export const isDryRun = core.getBooleanInput('dryrun')
 
-/** Config file path (default: '.github/labels.yaml') */
+/** Config file-path (default: '.github/labels.yaml') */
 export const path = core.getInput('path')
+
+/** Config file-path in the workspace */
+export const workspacePath = nodePath.join(workspace, path)
 
 /** Permissions */
 export const permissions = {
@@ -22,4 +28,4 @@ export const permissions = {
 export const readonly = core.getBooleanInput('readonly')
 
 /** Commit message to show */
-export const commitMessage = core.getInput('commit-message', { required: true })
+export const commitMessage = core.getInput('commit-message')

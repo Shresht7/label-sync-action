@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { octokit } from './octokit'
 import * as yaml from 'js-yaml'
 
 //  Helpers
@@ -14,11 +13,6 @@ import { getRepoLabels } from './getRepoLabels'
 //  Type Definitions
 import type { GitHubLabel, LabelMap } from '../types'
 import { createArtifacts } from './artifacts'
-
-
-const workspace = process.env.GITHUB_WORKSPACE || ''
-const configPath = path.join(workspace, config.path)
-const extension = path.extname(config.path)
 
 export async function syncConfigLabels() {
 
@@ -64,30 +58,8 @@ export async function syncConfigLabels() {
         return
     }
 
-    fs.writeFileSync(configPath, yamlContent, { encoding: 'utf-8' })
+    fs.writeFileSync(config.workspacePath, yamlContent, { encoding: 'utf-8' })
 
     createArtifacts('labels', [`./${config.path}`])
 
-    // //  Get .github/labels.yaml file (if it exists). For SHA
-    // let SHA
-    // if (!firstRun) {
-    //     const { data } = await octokit.rest.repos.getContent({
-    //         owner: github.context.repo.owner,
-    //         repo: github.context.repo.repo,
-    //         path: config.path
-    //     })
-
-    //     if (Array.isArray(data)) { return } //  If the response is not for a single file then exit
-    //     SHA = data.sha
-    // }
-
-    // //  Create or Update .github/labels.yaml file in the repo   //TODO: Maybe not push directly to master
-    // await octokit.rest.repos.createOrUpdateFileContents({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo,
-    //     path: config.path,
-    //     message: config.commitMessage,
-    //     content: Buffer.from(yamlContent).toString('base64'),
-    //     sha: SHA
-    // })
 }
