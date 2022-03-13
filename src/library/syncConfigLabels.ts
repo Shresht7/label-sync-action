@@ -13,6 +13,7 @@ import { getRepoLabels } from './getRepoLabels'
 
 //  Type Definitions
 import type { GitHubLabel, LabelMap } from '../types'
+import { createArtifacts } from './artifacts'
 
 
 const workspace = process.env.GITHUB_WORKSPACE || ''
@@ -64,6 +65,8 @@ export async function syncConfigLabels() {
     }
 
     fs.writeFileSync(configPath, yamlContent, { encoding: 'utf-8' })
+
+    createArtifacts('labels', [`./${config.path}`])
 
     // //  Get .github/labels.yaml file (if it exists). For SHA
     // let SHA
