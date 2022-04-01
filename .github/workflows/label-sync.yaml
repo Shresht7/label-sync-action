@@ -64,7 +64,7 @@ jobs:
 
       - name: update-labels-config
         id: update-labels-config
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: 'label-sync'
