@@ -9,7 +9,8 @@
 /** Metadata inputs */
 export const inputs = {
     isDryRun: 'dryrun',
-    config: 'config',
+    src: 'src',
+    dest: 'dest',
     create: 'create',
     update: 'update',
     delete: 'delete',

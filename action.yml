@@ -7,8 +7,8 @@ author: Shresht7
 description: GitHub Action to create, update, and delete labels from your repository declaratively
 
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: node16
+  main: dist/index.js
 
 branding:
   icon: tag
@@ -18,44 +18,45 @@ branding:
 # ======
 
 inputs:
-  # Dry Run Toggle
-  # --------------
+  # Labels Config
+  # -------------
 
-  dryrun:
-    description: "Dry-run toggle. label-sync will not make any actual changes if true (default: true)"
-    default: "true"
+  src:
+    description: Path to the file containing the label configuration
+    default: .github/labels.yml
+    required: false
+
+  dest:
+    description: Path to write the updated label config
     required: false
 
   # Permissions
   # -----------
 
   create:
-    description: "If true, label-sync has permission to create labels (default: true)"
+    description: If true, label-sync has permission to create labels
     default: "true"
     required: false
 
   update:
-    description: "If true, label-sync has permission to update labels (default: true)"
+    description: If true, label-sync has permission to update labels
     default: "true"
     required: false
 
   delete:
-    description: "If true, label-sync has permission to delete labels (default: false)"
+    description: If true, label-sync has permission to delete labels
     default: "false"
-    required: false
-
-  # Labels Config
-  # -------------
-
-  config:
-    description: "Path to the file containing the label configuration (default: .github/labels.yml)"
-    default: .github/labels.yml
     required: false
 
   # Artifact
   # --------
 
   artifact:
-    description: "Create an artifact of the updated labels config whenever a label is modified using the UI (default: false)"
+    description: Create an artifact of the updated labels config whenever a label is modified using the UI
     default: "false"
+    required: false
+
+  dryrun:
+    description: Dry-run toggle. label-sync will not make any actual changes if true
+    default: "true"
     required: false
