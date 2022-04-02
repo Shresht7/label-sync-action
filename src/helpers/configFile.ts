@@ -3,10 +3,29 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 import { isURL } from './isURL'
 
-/** Read config file from given path or url */
-export const readConfigFile = (path: string) => isURL(path)
-    ? fetch(path).then(res => res.text())
-    : fs.promises.readFile(path, { encoding: 'utf-8' })
+/** Read file from the given path or url */
+export async function readConfigFile(src: string) {
+    return isURL(src)
+        ? readFromURL(src)
+        : readFromFile(src)
+}
+
+/** Read from the given URL */
+function readFromURL(url: string): Promise<string> {
+    return fetch(url)
+        .then(res => {
+            if (res.ok) {
+                return res.text()
+            } else {
+                throw new Error(`Failed to read from ${url}`)
+            }
+        })
+}
+
+/** Read from the given path */
+function readFromFile(src: string): Promise<string> {
+    return fs.promises.readFile(src, { encoding: 'utf-8' })
+}
 
 /** Parse config file contents */
 export function parseConfig<T extends any[]>(contents: string, ext: string = 'yml'): T {
