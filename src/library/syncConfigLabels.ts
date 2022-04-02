@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 
 //  Helpers
-import { config, workspacePath, isDryRun, createArtifact } from '../config'
+import { config, isDryRun, createArtifact } from '../config'
 import { getRepoLabels } from './getRepoLabels'
 import { createArtifacts } from './artifacts'
 
@@ -55,7 +55,7 @@ export async function syncConfigLabels() {
     }
 
     //  Write yaml configuration to the workspace
-    fs.writeFileSync(workspacePath, content, { encoding: 'utf-8' })
+    fs.writeFileSync(config, content, { encoding: 'utf-8' })
 
     //  Generate artifacts of the updated label config
     if (createArtifact) {

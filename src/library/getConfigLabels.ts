@@ -1,6 +1,6 @@
 //  Library
 import * as path from 'node:path'
-import { workspacePath, config } from '../config'
+import { config } from '../config'
 
 //  Helpers
 import { readConfigFile, parseConfig } from '../helpers'
@@ -13,7 +13,7 @@ import type { GitHubLabel, LabelMap } from '../types'
 export async function getConfigLabels(): Promise<LabelMap> {
     const configLabels: LabelMap = new Map()
 
-    const contents: string = await readConfigFile(workspacePath)
+    const contents: string = await readConfigFile(config)
     const extension = path.extname(config)
 
     parseConfig<GitHubLabel[]>(contents, extension)
