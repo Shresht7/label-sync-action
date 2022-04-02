@@ -1,10 +1,10 @@
 //  Library
 import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
-import isUrl from 'is-url-superb'
+import { isURL } from './isURL'
 
 /** Read config file from given path or url */
-export const readConfigFile = (path: string) => isUrl(path)
+export const readConfigFile = (path: string) => isURL(path)
     ? fetch(path).then(res => res.text())
     : fs.promises.readFile(path, { encoding: 'utf-8' })
 
