@@ -1,846 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 88:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createArtifact = exports.permissions = exports.workspacePath = exports.config = exports.isDryRun = void 0;
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const path = __importStar(__nccwpck_require__(9411));
-if (!process.env.GITHUB_WORKSPACE) {
-    core.error("Could not find GITHUB_WORKSPACE environment variable. You need to use actions/checkout@v3 action for this action to have access to the repository's workspace");
-    process.exit(1);
-}
-//  ======
-//  CONFIG
-//  ======
-/** Boolean to determine if this is a dry-run */
-exports.isDryRun = core.getBooleanInput('dryrun');
-/** Config file path (default: '.github/labels.yaml') */
-exports.config = core.getInput('config');
-/** Config file path in the workspace */
-exports.workspacePath = path.join(process.env.GITHUB_WORKSPACE, exports.config);
-/** Permissions */
-exports.permissions = {
-    create: core.getBooleanInput('create'),
-    update: core.getBooleanInput('update'),
-    delete: core.getBooleanInput('delete')
-};
-/** Boolean to determine if an artifact containing an updated labels config should be created */
-exports.createArtifact = core.getBooleanInput('artifact');
-
-
-/***/ }),
-
-/***/ 8323:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseConfig = exports.readConfigFile = void 0;
-//  Library
-const fs = __importStar(__nccwpck_require__(7561));
-const yaml = __importStar(__nccwpck_require__(1917));
-const is_url_superb_1 = __importDefault(__nccwpck_require__(7548));
-/** Read config file from given path or url */
-const readConfigFile = (path) => (0, is_url_superb_1.default)(path)
-    ? fetch(path).then(res => res.text())
-    : fs.promises.readFile(path, { encoding: 'utf-8' });
-exports.readConfigFile = readConfigFile;
-/** Parse config file contents */
-function parseConfig(contents, ext = 'yml') {
-    let result = [];
-    if (ext.endsWith('json')) {
-        result = JSON.parse(contents);
-    }
-    else if (ext.endsWith('yml') || ext.endsWith('yaml')) {
-        result = yaml.load(contents);
-    }
-    else {
-        throw new Error('Incompatible config format. Please provide a `yaml` or `json` file.');
-    }
-    if (!Array.isArray(result)) {
-        throw new Error('Config is not an array!');
-    }
-    return result;
-}
-exports.parseConfig = parseConfig;
-
-
-/***/ }),
-
-/***/ 863:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-//  ================
-//  HELPER FUNCTIONS
-//  ================
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(7619), exports);
-__exportStar(__nccwpck_require__(4140), exports);
-__exportStar(__nccwpck_require__(8323), exports);
-
-
-/***/ }),
-
-/***/ 4140:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.labelSorter = void 0;
-/** Sort labels into create, update and delete categories */
-function labelSorter(existingLabels, configLabels) {
-    const createLabels = [];
-    const updateLabels = [];
-    const deleteLabels = [];
-    //  Create and Update lists
-    configLabels.forEach((label, labelName) => {
-        //  If Label already exist ...
-        if (existingLabels.has(labelName)) {
-            const existingLabel = existingLabels.get(labelName);
-            //  ... and has property mismatch
-            if (label.color !== (existingLabel === null || existingLabel === void 0 ? void 0 : existingLabel.color) || label.description !== (existingLabel === null || existingLabel === void 0 ? void 0 : existingLabel.description)) {
-                updateLabels.push(labelName); //  Sort in updateLabels array
-            }
-        }
-        else { //  If it does not exist ...
-            createLabels.push(labelName); //  Sort in createLabels array
-        }
-    });
-    //  Delete labels
-    existingLabels.forEach((_label, labelName) => {
-        //  if existing label doesn't exist in the config, delete it
-        if (!configLabels.has(labelName)) {
-            deleteLabels.push(labelName);
-        }
-    });
-    return { createLabels, updateLabels, deleteLabels };
-}
-exports.labelSorter = labelSorter;
-
-
-/***/ }),
-
-/***/ 7619:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.write = void 0;
-/** Maps modes to ANSI color codes */
-const colorMap = {
-    CREATE: '\u001b[32;1m',
-    UPDATE: '\u001b[34;1m',
-    DELETE: '\u001b[31;1m'
-};
-/** Writes message to the console */
-const write = (mode, label) => `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}\u001b[0m ${color(label.name, label.color)} ${label.description}`;
-exports.write = write;
-/** Colors the string using the given hex-code */
-function color(str, hex) {
-    hex = hex.startsWith('#') ? hex.slice(1) : hex;
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(0, 2), 16);
-    const b = parseInt(hex.substring(0, 2), 16);
-    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`;
-}
-
-
-/***/ }),
-
-/***/ 4822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const labelSync_1 = __importDefault(__nccwpck_require__(9342));
-//  ====
-//  MAIN
-//  ====
-/** Main entrypoint to the GitHub Action */
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield (0, labelSync_1.default)();
-            core.notice('🏷 Synchronization Complete! ✅');
-        }
-        catch (err) {
-            const error = err;
-            core.error(error);
-        }
-    });
-}
-run();
-
-
-/***/ }),
-
-/***/ 9342:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const library_1 = __nccwpck_require__(2172);
-const config_1 = __nccwpck_require__(88);
-//  ==========
-//  LABEL SYNC
-//  ==========
-/** Label-Sync-Action */
-function labelSync() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
-            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
-            yield (0, library_1.syncConfigLabels)();
-        }
-        else { //  If the action was triggered on push or manually by workflow dispatch or any other means
-            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
-            yield (0, library_1.syncRepoLabels)();
-        }
-    });
-}
-//  --------------------
-exports["default"] = labelSync;
-//  --------------------
-
-
-/***/ }),
-
-/***/ 1764:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createArtifacts = void 0;
-//  Library
-const artifact = __importStar(__nccwpck_require__(2605));
-/** Generate artifacts from the provided file paths */
-function createArtifacts(name, files, rootDir = './', options) {
-    const client = artifact.create();
-    return client.uploadArtifact(name, files, rootDir, options);
-}
-exports.createArtifacts = createArtifacts;
-
-
-/***/ }),
-
-/***/ 6178:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getConfigLabels = void 0;
-//  Library
-const path = __importStar(__nccwpck_require__(9411));
-const config_1 = __nccwpck_require__(88);
-//  Helpers
-const helpers_1 = __nccwpck_require__(863);
-/** Reads labels from the config-file and generates a LabelMap */
-function getConfigLabels() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const configLabels = new Map();
-        const contents = yield (0, helpers_1.readConfigFile)(config_1.workspacePath);
-        const extension = path.extname(config_1.config);
-        (0, helpers_1.parseConfig)(contents, extension)
-            .forEach(label => configLabels.set(label.name, label));
-        return configLabels;
-    });
-}
-exports.getConfigLabels = getConfigLabels;
-
-
-/***/ }),
-
-/***/ 6927:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRepoLabels = void 0;
-//  Library
-const github = __importStar(__nccwpck_require__(5438));
-const octokit_1 = __nccwpck_require__(3791);
-/** Returns a list of all labels in the current repository */
-function getRepoLabels() {
-    var e_1, _a;
-    return __awaiter(this, void 0, void 0, function* () {
-        const repoLabels = new Map();
-        const { owner, repo } = github.context.repo;
-        //  Fetch labels for current repo
-        const labelIterator = octokit_1.octokit.paginate.iterator(octokit_1.octokit.rest.issues.listLabelsForRepo, { owner, repo });
-        try {
-            for (var labelIterator_1 = __asyncValues(labelIterator), labelIterator_1_1; labelIterator_1_1 = yield labelIterator_1.next(), !labelIterator_1_1.done;) {
-                const { data } = labelIterator_1_1.value;
-                data.forEach(({ name, color, description }) => repoLabels.set(name, { name, color, description }));
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (labelIterator_1_1 && !labelIterator_1_1.done && (_a = labelIterator_1.return)) yield _a.call(labelIterator_1);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return repoLabels;
-    });
-}
-exports.getRepoLabels = getRepoLabels;
-
-
-/***/ }),
-
-/***/ 2172:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-//  =======
-//  LIBRARY
-//  =======
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-__exportStar(__nccwpck_require__(3791), exports);
-__exportStar(__nccwpck_require__(8095), exports);
-__exportStar(__nccwpck_require__(18), exports);
-
-
-/***/ }),
-
-/***/ 3791:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.octokit = void 0;
-//  Library
-const github = __importStar(__nccwpck_require__(5438));
-//  =======
-//  OCTOKIT
-//  =======
-/** GitHub Token */
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-if (!GITHUB_TOKEN) {
-    throw new Error('Invalid GITHUB_TOKEN');
-}
-//  --------------------------------------------------
-exports.octokit = github.getOctokit(GITHUB_TOKEN);
-//  --------------------------------------------------
-
-
-/***/ }),
-
-/***/ 18:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.syncConfigLabels = void 0;
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const fs = __importStar(__nccwpck_require__(7561));
-const yaml = __importStar(__nccwpck_require__(1917));
-//  Helpers
-const config_1 = __nccwpck_require__(88);
-const getRepoLabels_1 = __nccwpck_require__(6927);
-const artifacts_1 = __nccwpck_require__(1764);
-/** Reads the repository-labels and updates the label-sync config-file */
-function syncConfigLabels() {
-    return __awaiter(this, void 0, void 0, function* () {
-        /** Repository's existing labels */
-        const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)();
-        //  Get the webhook event action and the modified label
-        let { payload: { action, label } } = github.context;
-        core.info(`label ${label.name} ${action}`);
-        //  Only keep the label properties that are needed, discard the rest
-        label = {
-            name: label.name,
-            description: label.description,
-            color: label.color
-        };
-        //  Modify repo-labels depending on what changed
-        if (action === 'created' && !repoLabels.has(label.name)) { //  New label created
-            repoLabels.set(label.name, label);
-        }
-        else if (action === 'updated' && repoLabels.has(label.name)) { //  Existing label updated
-            repoLabels.set(label.name, label);
-        }
-        else if (action === 'deleted' && repoLabels.has(label.name)) { //  Existing label deleted
-            repoLabels.delete(label.name);
-        }
-        //  YAMLify repo-labels
-        let labels = [];
-        repoLabels.forEach((label) => labels.push(label));
-        let content = yaml.dump(labels);
-        content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
-        //  Log and exit if Dry-Run Mode
-        if (config_1.isDryRun) {
-            core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
-            core.info(content);
-            if (config_1.createArtifact) {
-                core.info('Creating artifacts');
-            }
-            return;
-        }
-        //  Write yaml configuration to the workspace
-        fs.writeFileSync(config_1.workspacePath, content, { encoding: 'utf-8' });
-        //  Generate artifacts of the updated label config
-        if (config_1.createArtifact) {
-            (0, artifacts_1.createArtifacts)('labels', [`./${config_1.config}`]);
-            core.notice(`Created artifacts containing ${config_1.config}`);
-        }
-    });
-}
-exports.syncConfigLabels = syncConfigLabels;
-
-
-/***/ }),
-
-/***/ 8095:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.syncRepoLabels = void 0;
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const config = __importStar(__nccwpck_require__(88));
-const octokit_1 = __nccwpck_require__(3791);
-//  Helpers
-const getConfigLabels_1 = __nccwpck_require__(6178);
-const getRepoLabels_1 = __nccwpck_require__(6927);
-const helpers_1 = __nccwpck_require__(863);
-const helpers_2 = __nccwpck_require__(863);
-/** Syncs labels from .github/labels.yaml to the repository */
-function syncRepoLabels() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { owner, repo } = github.context.repo;
-        const configLabels = yield (0, getConfigLabels_1.getConfigLabels)(); //  Get label data from file (.github/labels.yaml)
-        const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get label data from the repository
-        //  Sort labels into actionable categories
-        const { createLabels, updateLabels, deleteLabels } = (0, helpers_1.labelSorter)(repoLabels, configLabels);
-        //  Show dry-run notice
-        if (config.isDryRun) {
-            core.warning('NOTE: This is a dry run');
-        }
-        //  CREATE LABELS
-        //  -------------
-        if (config.permissions.create && createLabels.length > 0) {
-            core.info('\nCREATE LABELS');
-            createLabels.forEach((labelName) => {
-                const label = configLabels.get(labelName); //  Get label object from LabelMap
-                if (!label) {
-                    return;
-                } //  If label is undefined, exit
-                core.info((0, helpers_2.write)('CREATE', label));
-                if (config.isDryRun) {
-                    return;
-                }
-                octokit_1.octokit.rest.issues.createLabel({
-                    owner,
-                    repo,
-                    name: label.name,
-                    color: label.color || '#000000',
-                    description: label.description || ''
-                });
-            });
-        }
-        //  UPDATE LABELS
-        //  -------------
-        if (config.permissions.update && updateLabels.length > 0) {
-            core.info('\nUPDATE LABELS');
-            updateLabels.forEach((labelName) => {
-                const label = configLabels.get(labelName); //  Get label object from LabelMap
-                if (!label) {
-                    return;
-                } //  If label is undefined, exit
-                core.info((0, helpers_2.write)('UPDATE', label));
-                if (config.isDryRun) {
-                    return;
-                }
-                octokit_1.octokit.rest.issues.updateLabel({
-                    owner,
-                    repo,
-                    name: label.name,
-                    color: label.color || '#000000',
-                    description: label.description || ''
-                });
-            });
-        }
-        //  DELETE LABELS
-        //  -------------
-        if (config.permissions.delete && deleteLabels.length > 0) {
-            core.info('\nDELETE LABELS');
-            deleteLabels.forEach((labelName) => {
-                const label = repoLabels.get(labelName); //  Get label object from LabelMap
-                if (!label) {
-                    return;
-                } //  If label is undefined, return
-                core.info((0, helpers_2.write)('DELETE', label));
-                if (config.isDryRun) {
-                    return;
-                }
-                octokit_1.octokit.rest.issues.deleteLabel({
-                    owner,
-                    repo,
-                    name: label.name
-                });
-            });
-        }
-    });
-}
-exports.syncRepoLabels = syncRepoLabels;
-
-
-/***/ }),
-
 /***/ 2605:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -19474,6 +18634,846 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 6373:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createArtifact = exports.permissions = exports.workspacePath = exports.config = exports.isDryRun = void 0;
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const path = __importStar(__nccwpck_require__(9411));
+if (!process.env.GITHUB_WORKSPACE) {
+    core.error("Could not find GITHUB_WORKSPACE environment variable. You need to use actions/checkout@v3 action for this action to have access to the repository's workspace");
+    process.exit(1);
+}
+//  ======
+//  CONFIG
+//  ======
+/** Boolean to determine if this is a dry-run */
+exports.isDryRun = core.getBooleanInput('dryrun');
+/** Config file path (default: '.github/labels.yaml') */
+exports.config = core.getInput('config');
+/** Config file path in the workspace */
+exports.workspacePath = path.join(process.env.GITHUB_WORKSPACE, exports.config);
+/** Permissions */
+exports.permissions = {
+    create: core.getBooleanInput('create'),
+    update: core.getBooleanInput('update'),
+    delete: core.getBooleanInput('delete')
+};
+/** Boolean to determine if an artifact containing an updated labels config should be created */
+exports.createArtifact = core.getBooleanInput('artifact');
+
+
+/***/ }),
+
+/***/ 9516:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseConfig = exports.readConfigFile = void 0;
+//  Library
+const fs = __importStar(__nccwpck_require__(7561));
+const yaml = __importStar(__nccwpck_require__(1917));
+const is_url_superb_1 = __importDefault(__nccwpck_require__(7548));
+/** Read config file from given path or url */
+const readConfigFile = (path) => (0, is_url_superb_1.default)(path)
+    ? fetch(path).then(res => res.text())
+    : fs.promises.readFile(path, { encoding: 'utf-8' });
+exports.readConfigFile = readConfigFile;
+/** Parse config file contents */
+function parseConfig(contents, ext = 'yml') {
+    let result = [];
+    if (ext.endsWith('json')) {
+        result = JSON.parse(contents);
+    }
+    else if (ext.endsWith('yml') || ext.endsWith('yaml')) {
+        result = yaml.load(contents);
+    }
+    else {
+        throw new Error('Incompatible config format. Please provide a `yaml` or `json` file.');
+    }
+    if (!Array.isArray(result)) {
+        throw new Error('Config is not an array!');
+    }
+    return result;
+}
+exports.parseConfig = parseConfig;
+
+
+/***/ }),
+
+/***/ 3202:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+//  ================
+//  HELPER FUNCTIONS
+//  ================
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(1816), exports);
+__exportStar(__nccwpck_require__(8243), exports);
+__exportStar(__nccwpck_require__(9516), exports);
+
+
+/***/ }),
+
+/***/ 8243:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.labelSorter = void 0;
+/** Sort labels into create, update and delete categories */
+function labelSorter(existingLabels, configLabels) {
+    const createLabels = [];
+    const updateLabels = [];
+    const deleteLabels = [];
+    //  Create and Update lists
+    configLabels.forEach((label, labelName) => {
+        //  If Label already exist ...
+        if (existingLabels.has(labelName)) {
+            const existingLabel = existingLabels.get(labelName);
+            //  ... and has property mismatch
+            if (label.color !== (existingLabel === null || existingLabel === void 0 ? void 0 : existingLabel.color) || label.description !== (existingLabel === null || existingLabel === void 0 ? void 0 : existingLabel.description)) {
+                updateLabels.push(labelName); //  Sort in updateLabels array
+            }
+        }
+        else { //  If it does not exist ...
+            createLabels.push(labelName); //  Sort in createLabels array
+        }
+    });
+    //  Delete labels
+    existingLabels.forEach((_label, labelName) => {
+        //  if existing label doesn't exist in the config, delete it
+        if (!configLabels.has(labelName)) {
+            deleteLabels.push(labelName);
+        }
+    });
+    return { createLabels, updateLabels, deleteLabels };
+}
+exports.labelSorter = labelSorter;
+
+
+/***/ }),
+
+/***/ 1816:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.write = void 0;
+/** Maps modes to ANSI color codes */
+const colorMap = {
+    CREATE: '\u001b[32;1m',
+    UPDATE: '\u001b[34;1m',
+    DELETE: '\u001b[31;1m'
+};
+/** Writes message to the console */
+const write = (mode, label) => `${colorMap[mode]}${mode[0] + mode.slice(1, -1).toLowerCase() + 'ing'}\u001b[0m ${color(label.name, label.color)} ${label.description}`;
+exports.write = write;
+/** Colors the string using the given hex-code */
+function color(str, hex) {
+    hex = hex.startsWith('#') ? hex.slice(1) : hex;
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(0, 2), 16);
+    const b = parseInt(hex.substring(0, 2), 16);
+    return `\u001b[38;2;${r};${g};${b}m${str}\u001b[0m`;
+}
+
+
+/***/ }),
+
+/***/ 6144:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const labelSync_1 = __importDefault(__nccwpck_require__(655));
+//  ====
+//  MAIN
+//  ====
+/** Main entrypoint to the GitHub Action */
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield (0, labelSync_1.default)();
+            core.notice('🏷 Synchronization Complete! ✅');
+        }
+        catch (err) {
+            const error = err;
+            core.error(error);
+        }
+    });
+}
+run();
+
+
+/***/ }),
+
+/***/ 655:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const library_1 = __nccwpck_require__(4048);
+const config_1 = __nccwpck_require__(6373);
+//  ==========
+//  LABEL SYNC
+//  ==========
+/** Label-Sync-Action */
+function labelSync() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
+            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
+            yield (0, library_1.syncConfigLabels)();
+        }
+        else { //  If the action was triggered on push or manually by workflow dispatch or any other means
+            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
+            yield (0, library_1.syncRepoLabels)();
+        }
+    });
+}
+//  --------------------
+exports["default"] = labelSync;
+//  --------------------
+
+
+/***/ }),
+
+/***/ 2343:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createArtifacts = void 0;
+//  Library
+const artifact = __importStar(__nccwpck_require__(2605));
+/** Generate artifacts from the provided file paths */
+function createArtifacts(name, files, rootDir = './', options) {
+    const client = artifact.create();
+    return client.uploadArtifact(name, files, rootDir, options);
+}
+exports.createArtifacts = createArtifacts;
+
+
+/***/ }),
+
+/***/ 9739:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getConfigLabels = void 0;
+//  Library
+const path = __importStar(__nccwpck_require__(9411));
+const config_1 = __nccwpck_require__(6373);
+//  Helpers
+const helpers_1 = __nccwpck_require__(3202);
+/** Reads labels from the config-file and generates a LabelMap */
+function getConfigLabels() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const configLabels = new Map();
+        const contents = yield (0, helpers_1.readConfigFile)(config_1.workspacePath);
+        const extension = path.extname(config_1.config);
+        (0, helpers_1.parseConfig)(contents, extension)
+            .forEach(label => configLabels.set(label.name, label));
+        return configLabels;
+    });
+}
+exports.getConfigLabels = getConfigLabels;
+
+
+/***/ }),
+
+/***/ 9247:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRepoLabels = void 0;
+//  Library
+const github = __importStar(__nccwpck_require__(5438));
+const octokit_1 = __nccwpck_require__(9698);
+/** Returns a list of all labels in the current repository */
+function getRepoLabels() {
+    var e_1, _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        const repoLabels = new Map();
+        const { owner, repo } = github.context.repo;
+        //  Fetch labels for current repo
+        const labelIterator = octokit_1.octokit.paginate.iterator(octokit_1.octokit.rest.issues.listLabelsForRepo, { owner, repo });
+        try {
+            for (var labelIterator_1 = __asyncValues(labelIterator), labelIterator_1_1; labelIterator_1_1 = yield labelIterator_1.next(), !labelIterator_1_1.done;) {
+                const { data } = labelIterator_1_1.value;
+                data.forEach(({ name, color, description }) => repoLabels.set(name, { name, color, description }));
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (labelIterator_1_1 && !labelIterator_1_1.done && (_a = labelIterator_1.return)) yield _a.call(labelIterator_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return repoLabels;
+    });
+}
+exports.getRepoLabels = getRepoLabels;
+
+
+/***/ }),
+
+/***/ 4048:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+//  =======
+//  LIBRARY
+//  =======
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require__(9698), exports);
+__exportStar(__nccwpck_require__(2993), exports);
+__exportStar(__nccwpck_require__(9290), exports);
+
+
+/***/ }),
+
+/***/ 9698:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.octokit = void 0;
+//  Library
+const github = __importStar(__nccwpck_require__(5438));
+//  =======
+//  OCTOKIT
+//  =======
+/** GitHub Token */
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+if (!GITHUB_TOKEN) {
+    throw new Error('Invalid GITHUB_TOKEN');
+}
+//  --------------------------------------------------
+exports.octokit = github.getOctokit(GITHUB_TOKEN);
+//  --------------------------------------------------
+
+
+/***/ }),
+
+/***/ 9290:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.syncConfigLabels = void 0;
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const fs = __importStar(__nccwpck_require__(7561));
+const yaml = __importStar(__nccwpck_require__(1917));
+//  Helpers
+const config_1 = __nccwpck_require__(6373);
+const getRepoLabels_1 = __nccwpck_require__(9247);
+const artifacts_1 = __nccwpck_require__(2343);
+/** Reads the repository-labels and updates the label-sync config-file */
+function syncConfigLabels() {
+    return __awaiter(this, void 0, void 0, function* () {
+        /** Repository's existing labels */
+        const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)();
+        //  Get the webhook event action and the modified label
+        let { payload: { action, label } } = github.context;
+        core.info(`label ${label.name} ${action}`);
+        //  Only keep the label properties that are needed, discard the rest
+        label = {
+            name: label.name,
+            description: label.description,
+            color: label.color
+        };
+        //  Modify repo-labels depending on what changed
+        if (action === 'created' && !repoLabels.has(label.name)) { //  New label created
+            repoLabels.set(label.name, label);
+        }
+        else if (action === 'updated' && repoLabels.has(label.name)) { //  Existing label updated
+            repoLabels.set(label.name, label);
+        }
+        else if (action === 'deleted' && repoLabels.has(label.name)) { //  Existing label deleted
+            repoLabels.delete(label.name);
+        }
+        //  YAMLify repo-labels
+        let labels = [];
+        repoLabels.forEach((label) => labels.push(label));
+        let content = yaml.dump(labels);
+        content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
+        //  Log and exit if Dry-Run Mode
+        if (config_1.isDryRun) {
+            core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
+            core.info(content);
+            if (config_1.createArtifact) {
+                core.info('Creating artifacts');
+            }
+            return;
+        }
+        //  Write yaml configuration to the workspace
+        fs.writeFileSync(config_1.workspacePath, content, { encoding: 'utf-8' });
+        //  Generate artifacts of the updated label config
+        if (config_1.createArtifact) {
+            (0, artifacts_1.createArtifacts)('labels', [`./${config_1.config}`]);
+            core.notice(`Created artifacts containing ${config_1.config}`);
+        }
+    });
+}
+exports.syncConfigLabels = syncConfigLabels;
+
+
+/***/ }),
+
+/***/ 2993:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.syncRepoLabels = void 0;
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const config = __importStar(__nccwpck_require__(6373));
+const octokit_1 = __nccwpck_require__(9698);
+//  Helpers
+const getConfigLabels_1 = __nccwpck_require__(9739);
+const getRepoLabels_1 = __nccwpck_require__(9247);
+const helpers_1 = __nccwpck_require__(3202);
+const helpers_2 = __nccwpck_require__(3202);
+/** Syncs labels from .github/labels.yaml to the repository */
+function syncRepoLabels() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const { owner, repo } = github.context.repo;
+        const configLabels = yield (0, getConfigLabels_1.getConfigLabels)(); //  Get label data from file (.github/labels.yaml)
+        const repoLabels = yield (0, getRepoLabels_1.getRepoLabels)(); //  Get label data from the repository
+        //  Sort labels into actionable categories
+        const { createLabels, updateLabels, deleteLabels } = (0, helpers_1.labelSorter)(repoLabels, configLabels);
+        //  Show dry-run notice
+        if (config.isDryRun) {
+            core.warning('NOTE: This is a dry run');
+        }
+        //  CREATE LABELS
+        //  -------------
+        if (config.permissions.create && createLabels.length > 0) {
+            core.info('\nCREATE LABELS');
+            createLabels.forEach((labelName) => {
+                const label = configLabels.get(labelName); //  Get label object from LabelMap
+                if (!label) {
+                    return;
+                } //  If label is undefined, exit
+                core.info((0, helpers_2.write)('CREATE', label));
+                if (config.isDryRun) {
+                    return;
+                }
+                octokit_1.octokit.rest.issues.createLabel({
+                    owner,
+                    repo,
+                    name: label.name,
+                    color: label.color || '#000000',
+                    description: label.description || ''
+                });
+            });
+        }
+        //  UPDATE LABELS
+        //  -------------
+        if (config.permissions.update && updateLabels.length > 0) {
+            core.info('\nUPDATE LABELS');
+            updateLabels.forEach((labelName) => {
+                const label = configLabels.get(labelName); //  Get label object from LabelMap
+                if (!label) {
+                    return;
+                } //  If label is undefined, exit
+                core.info((0, helpers_2.write)('UPDATE', label));
+                if (config.isDryRun) {
+                    return;
+                }
+                octokit_1.octokit.rest.issues.updateLabel({
+                    owner,
+                    repo,
+                    name: label.name,
+                    color: label.color || '#000000',
+                    description: label.description || ''
+                });
+            });
+        }
+        //  DELETE LABELS
+        //  -------------
+        if (config.permissions.delete && deleteLabels.length > 0) {
+            core.info('\nDELETE LABELS');
+            deleteLabels.forEach((labelName) => {
+                const label = repoLabels.get(labelName); //  Get label object from LabelMap
+                if (!label) {
+                    return;
+                } //  If label is undefined, return
+                core.info((0, helpers_2.write)('DELETE', label));
+                if (config.isDryRun) {
+                    return;
+                }
+                octokit_1.octokit.rest.issues.deleteLabel({
+                    owner,
+                    repo,
+                    name: label.name
+                });
+            });
+        }
+    });
+}
+exports.syncRepoLabels = syncRepoLabels;
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -19737,7 +19737,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6144);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
