@@ -4,7 +4,7 @@ import { isURL } from '../../src/helpers/isURL'
 describe('isURL', () => {
 
     it('should return true for a URL', () => {
-        const url = 'https://www.github.com/Shresht7/markdown-slots'
+        const url = 'https://www.github.com/Shresht7/label-sync-action'
         expect(isURL(url)).toBeTruthy()
     })
 
