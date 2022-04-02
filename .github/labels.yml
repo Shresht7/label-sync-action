@@ -1,47 +1,47 @@
 - name: bug
-  color: EE0022
+  color: #EE0022
   description: Something isn't working
 
 - name: deferred
-  color: D2994D
+  color: #D2994D
   description: Work will resume in due course
 
 - name: dependencies
-  color: 0366d6
+  color: #0366d6
   description: Pull requests that update a dependency file
 
 - name: documentation
-  color: 0077CC
+  color: #0077CC
   description: Improvements or additions to documentation
 
 - name: duplicate
-  color: cfd3d7
+  color: #cfd3d7
   description: This issue or pull request already exists
 
 - name: enhancement
-  color: 586CA7
+  color: #586CA7
   description: New feature or request
 
 - name: github_actions
-  color: '000000'
+  color: "#000000"
   description: Pull requests that update GitHub Actions code
 
 - name: good first issue
-  color: 7057ff
+  color: #7057ff
   description: Good for newcomers
 
 - name: help wanted
-  color: '008672'
+  color: "#008672"
   description: Extra attention is needed
 
 - name: invalid
-  color: e4e669
+  color: #e4e669
   description: This doesn't seem right
 
 - name: question
-  color: d876e3
+  color: #d876e3
   description: Further information is requested
 
 - name: wontfix
-  color: ffffff
+  color: #ffffff
   description: This will not be worked on
