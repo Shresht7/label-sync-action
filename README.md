@@ -1,16 +1,71 @@
-# label-sync-action 🏷
+<!-- ========== -->
+<!-- LABEL SYNC -->
+<!-- ========== -->
 
-GitHub Action to synchronize and manage your repository's labels 🏷
+<h1 align='center'>Label Sync</h1>
+
+<!-- REPOSITORY BADGES -->
+<!-- ================= -->
+
+<div align='center'>
+
+[![Release](https://img.shields.io/github/v/release/Shresht7/label-sync-action?style=for-the-badge)](https://github.com/Shresht7/label-sync-action/releases)
+[![License](https://img.shields.io/github/license/Shresht7/label-sync-action?style=for-the-badge)](./LICENSE)
+
+</div>
+
+<!-- DESCRIPTION -->
+<!-- =========== -->
+
+<p align='center'>
+<!-- slot: description -->
+A GitHub Action to dynamically place content in markdown slots
+<!-- /slot -->
+</p>
+
+<!-- WORKFLOW BADGES -->
+<!-- =============== -->
+
+<div align='center'>
+
+[![Test](https://github.com/Shresht7/label-sync-action/actions/workflows/test.yml/badge.svg)](https://github.com/Shresht7/label-sync-action/actions/workflows/test.yml)
+[![Validate](https://github.com/Shresht7/label-sync-action/actions/workflows/validate.yml/badge.svg)](https://github.com/Shresht7/label-sync-action/actions/workflows/validate.yml)
+[![Action Readme](https://github.com/Shresht7/label-sync-action/actions/workflows/action-readme.yml/badge.svg)](https://github.com/Shresht7/label-sync-action/actions/workflows/action-readme.yml)
+
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<!-- ================= -->
+
+<details>
+
+<summary align='center'>Table of Contents</summary>
+
+- [📑 Permissions](#-permissions)
+- [📖 Usage](#-usage)
+  - [Example Config](#example-config)
+- [� Inputs](#-inputs)
+- [📋 Outputs](#-outputs)
+- [📑 License](#-license)
+
+</details>
+
+---
 
 You can _create_, _update_ and _delete_ labels declaratively by editing a config-file and pushing those changes to the **default branch** of your repo.
 
 The action will sync repo-labels when you push an edit to the config file (default: `.github/labels.yaml`) to the main branch or when the `label` webhook event is triggered. You can also activate the action manually (`workflow_dispatch`) from the Actions tab.
 If the config file (`.github/labels.yaml`) does not exist when the action executes, it will create the file automatically and fill in the details of the labels used in your repository.
 
-### Workflow setup
+## 📑 Permissions
 
-Create a workflow file `.github/workflows/label-sync.yaml` and configure the input parameters.
+This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to modify labels.
 
+## 📖 Usage
+
+Create a workflow file (e.g. `.github/workflows/label-sync.yaml`) and configure the input parameters.
+
+<!-- slot: example, prepend: ```yaml, append: ``` -->
 ```yaml
 # ============================================
 #                   LABEL-SYNC
@@ -85,6 +140,8 @@ jobs:
           commit-message: 'Update labels 🏷'
           title: 'Update labels 🏷'
 ```
+<!-- /slot -->
+
 > NOTE: Potential changes will only be logged if dry run is `true`. For label-sync to actually modify anything you will have to set `dryrun` to `false`.
 
 ### Example Config
@@ -108,6 +165,18 @@ The config file (`.github/labels.yaml`) will look something like this:
 
 > NOTE: If you're prefixing colors with a `#` then wrap them with quotation marks (like '#ffffff') or yaml will think anything following the `#` is a comment.
 
-## Permissions
+## 📋 Inputs
 
-This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to modify labels.
+<!-- slot: inputs -->
+<!-- /slot -->
+
+## 📋 Outputs
+
+<!-- slot: outputs -->
+<!-- /slot -->
+
+---
+
+## 📑 License
+
+> [MIT License](./LICENSE)
