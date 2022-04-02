@@ -4,7 +4,7 @@
 
 name: label-sync
 author: Shresht7
-description: Create, update, and delete labels from your repository declaratively
+description: GitHub Action to create, update, and delete labels from your repository declaratively
 
 runs:
   using: "node16"

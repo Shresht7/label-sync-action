@@ -1,7 +1,7 @@
 {
-  "name": "label-sync-action",
+  "name": "label-sync",
   "version": "1.0.0",
-  "description": "GitHub Action to synchronize and manage labels 🏷",
+  "description": "GitHub Action to create, update, and delete labels from your repository declaratively",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ncc build src/index.ts --source-map --license licenses.txt",
