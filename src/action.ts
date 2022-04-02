@@ -9,7 +9,7 @@ import { config } from './config'
 //  ==========
 
 /** Label-Sync-Action */
-async function labelSync() {
+async function action() {
 
     if (github.context.eventName === 'label') {     //  If the action was triggered by the label webhook event
 
@@ -23,9 +23,11 @@ async function labelSync() {
 
     }
 
+    core.notice('🏷 Synchronization Complete! ✅')
+
 }
 
 
-//  --------------------
-export default labelSync
-//  --------------------
+//  -----------------
+export default action
+//  -----------------

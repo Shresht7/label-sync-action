@@ -1,6 +1,6 @@
 //  Library
 import * as core from '@actions/core'
-import labelSync from './labelSync'
+import action from './action'
 
 //  ====
 //  MAIN
@@ -9,10 +9,10 @@ import labelSync from './labelSync'
 /** Main entrypoint to the GitHub Action */
 async function run() {
     try {
-        await labelSync()
-        core.notice('🏷 Synchronization Complete! ✅')
+        await action()
     } catch (err) {
         const error = err as Error
+        core.setFailed(error)
         core.error(error)
     }
 }
