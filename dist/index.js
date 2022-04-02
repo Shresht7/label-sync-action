@@ -18756,6 +18756,73 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 7672:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+//  Library
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const library_1 = __nccwpck_require__(4048);
+const config_1 = __nccwpck_require__(6373);
+//  ==========
+//  LABEL SYNC
+//  ==========
+/** Label-Sync-Action */
+function action() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
+            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
+            yield (0, library_1.syncConfigLabels)();
+        }
+        else { //  If the action was triggered on push or manually by workflow dispatch or any other means
+            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
+            yield (0, library_1.syncRepoLabels)();
+        }
+        core.notice('🏷 Synchronization Complete! ✅');
+    });
+}
+//  -----------------
+exports["default"] = action;
+//  -----------------
+
+
+/***/ }),
+
 /***/ 6373:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -18788,21 +18855,22 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createArtifact = exports.permissions = exports.config = exports.isDryRun = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
+const metadata_1 = __nccwpck_require__(3252);
 //  ======
 //  CONFIG
 //  ======
 /** Boolean to determine if this is a dry-run */
-exports.isDryRun = core.getBooleanInput('dryrun');
+exports.isDryRun = core.getBooleanInput(metadata_1.inputs.isDryRun);
 /** Config file path (default: '.github/labels.yaml') */
-exports.config = core.getInput('config');
+exports.config = core.getInput(metadata_1.inputs.config);
 /** Permissions */
 exports.permissions = {
-    create: core.getBooleanInput('create'),
-    update: core.getBooleanInput('update'),
-    delete: core.getBooleanInput('delete')
+    create: core.getBooleanInput(metadata_1.inputs.create),
+    update: core.getBooleanInput(metadata_1.inputs.update),
+    delete: core.getBooleanInput(metadata_1.inputs.delete)
 };
 /** Boolean to determine if an artifact containing an updated labels config should be created */
-exports.createArtifact = core.getBooleanInput('artifact');
+exports.createArtifact = core.getBooleanInput(metadata_1.inputs.createArtifact);
 
 
 /***/ }),
@@ -18835,17 +18903,46 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseConfig = exports.readConfigFile = void 0;
 //  Library
 const fs = __importStar(__nccwpck_require__(7561));
 const yaml = __importStar(__nccwpck_require__(1917));
 const isURL_1 = __nccwpck_require__(4127);
-/** Read config file from given path or url */
-const readConfigFile = (path) => (0, isURL_1.isURL)(path)
-    ? fetch(path).then(res => res.text())
-    : fs.promises.readFile(path, { encoding: 'utf-8' });
+/** Read file from the given path or url */
+function readConfigFile(src) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return (0, isURL_1.isURL)(src)
+            ? readFromURL(src)
+            : readFromFile(src);
+    });
+}
 exports.readConfigFile = readConfigFile;
+/** Read from the given URL */
+function readFromURL(url) {
+    return fetch(url)
+        .then(res => {
+        if (res.ok) {
+            return res.text();
+        }
+        else {
+            throw new Error(`Failed to read from ${url}`);
+        }
+    });
+}
+/** Read from the given path */
+function readFromFile(src) {
+    return fs.promises.readFile(src, { encoding: 'utf-8' });
+}
 /** Parse config file contents */
 function parseConfig(contents, ext = 'yml') {
     let result = [];
@@ -19032,7 +19129,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
-const labelSync_1 = __importDefault(__nccwpck_require__(655));
+const action_1 = __importDefault(__nccwpck_require__(7672));
 //  ====
 //  MAIN
 //  ====
@@ -19040,82 +19137,16 @@ const labelSync_1 = __importDefault(__nccwpck_require__(655));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield (0, labelSync_1.default)();
-            core.notice('🏷 Synchronization Complete! ✅');
+            yield (0, action_1.default)();
         }
         catch (err) {
             const error = err;
+            core.setFailed(error);
             core.error(error);
         }
     });
 }
 run();
-
-
-/***/ }),
-
-/***/ 655:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-//  Library
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const library_1 = __nccwpck_require__(4048);
-const config_1 = __nccwpck_require__(6373);
-//  ==========
-//  LABEL SYNC
-//  ==========
-/** Label-Sync-Action */
-function labelSync() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
-            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
-            yield (0, library_1.syncConfigLabels)();
-        }
-        else { //  If the action was triggered on push or manually by workflow dispatch or any other means
-            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
-            yield (0, library_1.syncRepoLabels)();
-        }
-    });
-}
-//  --------------------
-exports["default"] = labelSync;
-//  --------------------
 
 
 /***/ }),
@@ -19605,6 +19636,34 @@ function syncRepoLabels() {
     });
 }
 exports.syncRepoLabels = syncRepoLabels;
+
+
+/***/ }),
+
+/***/ 3252:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+//  ===============
+//  ACTION METADATA
+//  ===============
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.outputs = exports.inputs = void 0;
+//  ========
+//  METADATA
+//  ========
+/** Metadata inputs */
+exports.inputs = {
+    isDryRun: 'dryrun',
+    config: 'config',
+    create: 'create',
+    update: 'update',
+    delete: 'delete',
+    createArtifact: 'artifact'
+};
+/** Metadata outputs */
+exports.outputs = {};
 
 
 /***/ }),
