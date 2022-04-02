@@ -18,28 +18,31 @@ branding:
 # ======
 
 inputs:
-
   # Dry Run Toggle
   # --------------
 
   dryrun:
     description: "Dry-run toggle. label-sync will not make any actual changes if true (default: true)"
-    default: true
+    default: "true"
+    required: false
 
   # Permissions
   # -----------
 
   create:
     description: "If true, label-sync has permission to create labels (default: true)"
-    default: true
+    default: "true"
+    required: false
 
   update:
     description: "If true, label-sync has permission to update labels (default: true)"
-    default: true
+    default: "true"
+    required: false
 
   delete:
     description: "If true, label-sync has permission to delete labels (default: false)"
-    default: false
+    default: "false"
+    required: false
 
   # Labels Config
   # -------------
@@ -47,10 +50,12 @@ inputs:
   config:
     description: "Path to the file containing the label configuration (default: .github/labels.yaml)"
     default: .github/labels.yaml
+    required: false
 
   # Artifact
   # --------
 
   artifact:
     description: "Create an artifact of the updated labels config whenever a label is modified using the UI (default: false)"
-    default: false
+    default: "false"
+    required: false
