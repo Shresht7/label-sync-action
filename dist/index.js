@@ -18806,11 +18806,11 @@ const config_1 = __nccwpck_require__(6373);
 function action() {
     return __awaiter(this, void 0, void 0, function* () {
         if (github.context.eventName === 'label') { //  If the action was triggered by the label webhook event
-            core.info(`Synchronizing labels from your repository to ${config_1.config}`);
+            core.info(`Synchronizing labels from your repository to ${config_1.dest}`);
             yield (0, library_1.syncConfigLabels)();
         }
         else { //  If the action was triggered on push or manually by workflow dispatch or any other means
-            core.info(`Synchronizing labels from ${config_1.config} to your repository`);
+            core.info(`Synchronizing labels from ${config_1.src} to your repository`);
             yield (0, library_1.syncRepoLabels)();
         }
         core.notice('🏷 Synchronization Complete! ✅');
@@ -18852,7 +18852,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createArtifact = exports.permissions = exports.config = exports.isDryRun = void 0;
+exports.createArtifact = exports.permissions = exports.dest = exports.src = exports.isDryRun = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
 const metadata_1 = __nccwpck_require__(3252);
@@ -18862,7 +18862,9 @@ const metadata_1 = __nccwpck_require__(3252);
 /** Boolean to determine if this is a dry-run */
 exports.isDryRun = core.getBooleanInput(metadata_1.inputs.isDryRun);
 /** Config file path (default: '.github/labels.yaml') */
-exports.config = core.getInput(metadata_1.inputs.config);
+exports.src = core.getInput(metadata_1.inputs.src);
+/** Destination file to write update label config */
+exports.dest = core.getInput(metadata_1.inputs.dest);
 /** Permissions */
 exports.permissions = {
     create: core.getBooleanInput(metadata_1.inputs.create),
@@ -19241,8 +19243,8 @@ const helpers_1 = __nccwpck_require__(3202);
 function getConfigLabels() {
     return __awaiter(this, void 0, void 0, function* () {
         const configLabels = new Map();
-        const contents = yield (0, helpers_1.readConfigFile)(config_1.config);
-        const extension = path.extname(config_1.config);
+        const contents = yield (0, helpers_1.readConfigFile)(config_1.src);
+        const extension = path.extname(config_1.src);
         (0, helpers_1.parseConfig)(contents, extension)
             .forEach(label => configLabels.set(label.name, label));
         return configLabels;
@@ -19495,11 +19497,13 @@ function syncConfigLabels() {
             return;
         }
         //  Write yaml configuration to the workspace
-        fs.writeFileSync(config_1.config, content, { encoding: 'utf-8' });
-        //  Generate artifacts of the updated label config
-        if (config_1.createArtifact) {
-            (0, artifacts_1.createArtifacts)('labels', [`./${config_1.config}`]);
-            core.notice(`Created artifacts containing ${config_1.config}`);
+        if (config_1.dest) {
+            fs.writeFileSync(config_1.dest, content, { encoding: 'utf-8' });
+            //  Generate artifacts of the updated label config
+            if (config_1.createArtifact) {
+                (0, artifacts_1.createArtifacts)('labels', [`./${config_1.dest}`]);
+                core.notice(`Created artifacts containing ${config_1.dest}`);
+            }
         }
     });
 }
@@ -19656,7 +19660,8 @@ exports.outputs = exports.inputs = void 0;
 /** Metadata inputs */
 exports.inputs = {
     isDryRun: 'dryrun',
-    config: 'config',
+    src: 'src',
+    dest: 'dest',
     create: 'create',
     update: 'update',
     delete: 'delete',
