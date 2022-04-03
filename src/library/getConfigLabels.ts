@@ -13,11 +13,13 @@ import type { GitHubLabel, LabelMap } from '../types'
 export async function getConfigLabels(): Promise<LabelMap> {
     const configLabels: LabelMap = new Map()
 
-    const contents: string = await readConfigFile(config)
-    const extension = path.extname(config)
+    for (const cfg of config) {
+        const contents: string = await readConfigFile(cfg)
+        const extension = path.extname(cfg)
 
-    parseConfig<GitHubLabel[]>(contents, extension)
-        .forEach(label => configLabels.set(label.name, label))
+        parseConfig<GitHubLabel[]>(contents, extension)
+            .forEach(label => configLabels.set(label.name, label))
+    }
 
     return configLabels
 
