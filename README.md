@@ -61,7 +61,7 @@ This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to mo
 
 Create a workflow file (e.g. `.github/workflows/label-sync.yaml`) and configure the input parameters.
 
-<!-- slot: example, prepend: ```yaml, append: ``` -->
+<!-- slot: example,  prepend: ```yaml, append: ``` -->
 ```yaml
 # ============================================
 #                   LABEL-SYNC
@@ -77,11 +77,10 @@ name: Label Sync
 on:
   # When .github/labels.yml changes are pushed to the default branch
   push:
+    branches:
+      - main
     paths:
       - .github/labels.yml
-
-  # When a label webhook event (create, update, delete) is triggered
-  label:
 
   # When a workflow event is dispatched manually
   workflow_dispatch:
@@ -114,18 +113,6 @@ jobs:
         env:
           # Needed to make use of the GitHub API to modify labels and update .github/labels.yml file
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Create Pull-Request with updated Label Config
-      # =============================================
-
-      - name: update-labels-config
-        id: update-labels-config
-        uses: peter-evans/create-pull-request@v4.0.1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: "label-sync"
-          commit-message: "Update labels 🏷"
-          title: "Update labels 🏷"
 
 ```
 <!-- /slot -->
