@@ -65,7 +65,7 @@ This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to mo
 
 Create a workflow file (e.g. `.github/workflows/label-sync.yaml`) and configure the input parameters.
 
-<!-- slot: example,  prepend: ```yaml, append: ``` -->
+<!-- slot: example,   prepend: ```yaml, append: ``` -->
 ```yaml
 # ============================================
 #                   LABEL-SYNC
@@ -160,15 +160,13 @@ The config file (`.github/labels.yaml`) will look something like this:
 ## 📋 Inputs
 
 <!-- slot: inputs -->
-| Input      | Description                                                                               |              Default | Required |
-| :--------- | :---------------------------------------------------------------------------------------- | -------------------: | :------: |
-| `src`      | Path to the file containing the label configuration                                       | `.github/labels.yml` |          |
-| `dest`     | Path to write the updated label config                                                    |          `undefined` |          |
-| `create`   | If true, label-sync has permission to create labels                                       |               `true` |          |
-| `update`   | If true, label-sync has permission to update labels                                       |               `true` |          |
-| `delete`   | If true, label-sync has permission to delete labels                                       |              `false` |          |
-| `artifact` | Create an artifact of the updated labels config whenever a label is modified using the UI |              `false` |          |
-| `dryrun`   | Dry-run toggle. label-sync will not make any actual changes if true                       |               `true` |          |
+| Input    | Description                                                          |              Default | Required |
+| :------- | :------------------------------------------------------------------- | -------------------: | :------: |
+| `config` | Path to the files containing the label configurations. (Can be URLs) | `.github/labels.yml` |          |
+| `create` | If true, label-sync has permission to create labels                  |               `true` |          |
+| `update` | If true, label-sync has permission to update labels                  |               `true` |          |
+| `delete` | If true, label-sync has permission to delete labels                  |              `false` |          |
+| `dryrun` | Dry-run toggle. label-sync will not make any actual changes if true  |               `true` |          |
 <!-- /slot -->
 
 ## 📋 Outputs
