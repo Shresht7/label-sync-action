@@ -48,13 +48,8 @@ inputs:
     default: "false"
     required: false
 
-  # Artifact
-  # --------
-
-  artifact:
-    description: Create an artifact of the updated labels config whenever a label is modified using the UI
-    default: "false"
-    required: false
+  # Miscellaneous
+  # -------------
 
   dryrun:
     description: Dry-run toggle. label-sync will not make any actual changes if true

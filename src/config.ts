@@ -21,6 +21,3 @@ export const permissions = {
     update: core.getBooleanInput(inputs.update),
     delete: core.getBooleanInput(inputs.delete)
 }
-
-/** Boolean to determine if an artifact containing an updated labels config should be created */
-export const createArtifact = core.getBooleanInput(inputs.createArtifact)

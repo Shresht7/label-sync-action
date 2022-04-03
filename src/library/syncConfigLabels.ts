@@ -5,9 +5,8 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 
 //  Helpers
-import { dest, dryrun, createArtifact } from '../config'
+import { dest, dryrun } from '../config'
 import { getRepoLabels } from './getRepoLabels'
-import { createArtifacts } from './artifacts'
 
 //  Type Definitions
 import { GitHubLabel } from '../types'
@@ -48,21 +47,12 @@ export async function syncConfigLabels() {
     if (dryrun) {
         core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
         core.info(content)
-        if (createArtifact) {
-            core.info('Creating artifacts')
-        }
         return
     }
 
     //  Write yaml configuration to the workspace
     if (dest) {
         fs.writeFileSync(dest, content, { encoding: 'utf-8' })
-
-        //  Generate artifacts of the updated label config
-        if (createArtifact) {
-            createArtifacts('labels', [`./${dest}`])
-            core.notice(`Created artifacts containing ${dest}`)
-        }
     }
 
 }

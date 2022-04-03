@@ -14,7 +14,6 @@ export const inputs = {
     create: 'create',
     update: 'update',
     delete: 'delete',
-    createArtifact: 'artifact'
 } as const
 
 /** Metadata outputs */
