@@ -10,10 +10,7 @@ import { inputs } from './metadata'
 export const dryrun = core.getBooleanInput(inputs.dryrun)
 
 /** Config file path (default: '.github/labels.yaml') */
-export const src = core.getInput(inputs.src)
-
-/** Destination file to write update label config */
-export const dest = core.getInput(inputs.dest)
+export const config = core.getInput(inputs.config)
 
 /** Permissions */
 export const permissions = {

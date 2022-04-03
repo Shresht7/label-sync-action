@@ -21,13 +21,9 @@ inputs:
   # Labels Config
   # -------------
 
-  src:
+  config:
     description: Path to the file containing the label configuration
     default: .github/labels.yml
-    required: false
-
-  dest:
-    description: Path to write the updated label config
     required: false
 
   # Permissions
