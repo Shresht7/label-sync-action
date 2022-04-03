@@ -44,18 +44,14 @@ GitHub Action to create, update, and delete labels from your repository declarat
 - [📑 Permissions](#-permissions)
 - [📖 Usage](#-usage)
   - [Example Config](#example-config)
-- [� Inputs](#-inputs)
-- [📋 Outputs](#-outputs)
-- [📑 License](#-license)
+- [📋 Inputs](#-inputs)
+- [� License](#-license)
 
 </details>
 
 ---
 
-You can _create_, _update_ and _delete_ labels declaratively by editing a config-file and pushing those changes to the **default branch** of your repo.
-
-The action will sync repo-labels when you push an edit to the config file (default: `.github/labels.yaml`) to the main branch or when the `label` webhook event is triggered. You can also activate the action manually (`workflow_dispatch`) from the Actions tab.
-If the config file (`.github/labels.yaml`) does not exist when the action executes, it will create the file automatically and fill in the details of the labels used in your repository.
+You can _create_, _update_ and _delete_ labels declaratively by editing a config-file.
 
 ## 📑 Permissions
 
@@ -65,7 +61,7 @@ This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to mo
 
 Create a workflow file (e.g. `.github/workflows/label-sync.yaml`) and configure the input parameters.
 
-<!-- slot: example,   prepend: ```yaml, append: ``` -->
+<!-- slot: example, prepend: ```yaml, append: ``` -->
 ```yaml
 # ============================================
 #                   LABEL-SYNC
@@ -142,15 +138,15 @@ The config file (`.github/labels.yaml`) will look something like this:
 
 ```yaml
 - name: bug
-  color: '#ee1111'
+  color: ee1111
   description: Something isn't working
 
 - name: documentation
-  color: '#0e8a16'
+  color: 0e8a16
   description: Improvements or additions to the documentation
 
 - name: enhancement
-  color: '#a2eeef'
+  color: a2eeef
   description: New feature or request
 
 ```
@@ -167,12 +163,6 @@ The config file (`.github/labels.yaml`) will look something like this:
 | `update` | If true, label-sync has permission to update labels                  |               `true` |          |
 | `delete` | If true, label-sync has permission to delete labels                  |              `false` |          |
 | `dryrun` | Dry-run toggle. label-sync will not make any actual changes if true  |               `true` |          |
-<!-- /slot -->
-
-## 📋 Outputs
-
-<!-- slot: outputs -->
-
 <!-- /slot -->
 
 ---
