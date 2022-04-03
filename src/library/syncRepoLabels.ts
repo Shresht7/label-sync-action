@@ -21,7 +21,7 @@ export async function syncRepoLabels() {
     const { createLabels, updateLabels, deleteLabels } = labelSorter(repoLabels, configLabels)
 
     //  Show dry-run notice
-    if (config.isDryRun) { core.warning('NOTE: This is a dry run') }
+    if (config.dryrun) { core.warning('NOTE: This is a dry run') }
 
     //  CREATE LABELS
     //  -------------
@@ -34,7 +34,7 @@ export async function syncRepoLabels() {
             if (!label) { return }  //  If label is undefined, exit
 
             core.info(write('CREATE', label))
-            if (config.isDryRun) { return }
+            if (config.dryrun) { return }
 
             octokit.rest.issues.createLabel({
                 owner,
@@ -57,7 +57,7 @@ export async function syncRepoLabels() {
             if (!label) { return }  //  If label is undefined, exit
 
             core.info(write('UPDATE', label))
-            if (config.isDryRun) { return }
+            if (config.dryrun) { return }
 
             octokit.rest.issues.updateLabel({
                 owner,
@@ -80,7 +80,7 @@ export async function syncRepoLabels() {
             if (!label) { return }  //  If label is undefined, return
 
             core.info(write('DELETE', label))
-            if (config.isDryRun) { return }
+            if (config.dryrun) { return }
 
             octokit.rest.issues.deleteLabel({
                 owner,

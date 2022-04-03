@@ -7,7 +7,7 @@ import { inputs } from './metadata'
 //  ======
 
 /** Boolean to determine if this is a dry-run */
-export const isDryRun = core.getBooleanInput(inputs.isDryRun)
+export const dryrun = core.getBooleanInput(inputs.dryrun)
 
 /** Config file path (default: '.github/labels.yaml') */
 export const src = core.getInput(inputs.src)

@@ -5,7 +5,7 @@ import * as fs from 'node:fs'
 import * as yaml from 'js-yaml'
 
 //  Helpers
-import { dest, isDryRun, createArtifact } from '../config'
+import { dest, dryrun, createArtifact } from '../config'
 import { getRepoLabels } from './getRepoLabels'
 import { createArtifacts } from './artifacts'
 
@@ -45,7 +45,7 @@ export async function syncConfigLabels() {
     content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart()   //  Add additional \n for clarity sake
 
     //  Log and exit if Dry-Run Mode
-    if (isDryRun) {
+    if (dryrun) {
         core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m')
         core.info(content)
         if (createArtifact) {
