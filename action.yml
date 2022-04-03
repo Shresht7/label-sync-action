@@ -22,7 +22,7 @@ inputs:
   # -------------
 
   config:
-    description: Path to the file containing the label configuration
+    description: Path to the files containing the label configurations. (Can be URLs)
     default: .github/labels.yml
     required: false
 
