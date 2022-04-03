@@ -45,3 +45,7 @@
 - name: wontfix
   color: ffffff
   description: This will not be worked on
+
+- name: javascript
+  color: F0DB4F
+  description: This will not be worked on
