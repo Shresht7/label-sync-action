@@ -18852,7 +18852,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createArtifact = exports.permissions = exports.dest = exports.src = exports.isDryRun = void 0;
+exports.createArtifact = exports.permissions = exports.dest = exports.src = exports.dryrun = void 0;
 //  Library
 const core = __importStar(__nccwpck_require__(2186));
 const metadata_1 = __nccwpck_require__(3252);
@@ -18860,7 +18860,7 @@ const metadata_1 = __nccwpck_require__(3252);
 //  CONFIG
 //  ======
 /** Boolean to determine if this is a dry-run */
-exports.isDryRun = core.getBooleanInput(metadata_1.inputs.isDryRun);
+exports.dryrun = core.getBooleanInput(metadata_1.inputs.dryrun);
 /** Config file path (default: '.github/labels.yaml') */
 exports.src = core.getInput(metadata_1.inputs.src);
 /** Destination file to write update label config */
@@ -19488,7 +19488,7 @@ function syncConfigLabels() {
         let content = yaml.dump(labels);
         content = content.replace(/(\s+-\s+\w+:.*)/g, '\n$1').trimStart(); //  Add additional \n for clarity sake
         //  Log and exit if Dry-Run Mode
-        if (config_1.isDryRun) {
+        if (config_1.dryrun) {
             core.warning('\u001b[33;1mNOTE: This is a dry run\u001b[0m');
             core.info(content);
             if (config_1.createArtifact) {
@@ -19570,7 +19570,7 @@ function syncRepoLabels() {
         //  Sort labels into actionable categories
         const { createLabels, updateLabels, deleteLabels } = (0, helpers_1.labelSorter)(repoLabels, configLabels);
         //  Show dry-run notice
-        if (config.isDryRun) {
+        if (config.dryrun) {
             core.warning('NOTE: This is a dry run');
         }
         //  CREATE LABELS
@@ -19583,7 +19583,7 @@ function syncRepoLabels() {
                     return;
                 } //  If label is undefined, exit
                 core.info((0, helpers_2.write)('CREATE', label));
-                if (config.isDryRun) {
+                if (config.dryrun) {
                     return;
                 }
                 octokit_1.octokit.rest.issues.createLabel({
@@ -19605,7 +19605,7 @@ function syncRepoLabels() {
                     return;
                 } //  If label is undefined, exit
                 core.info((0, helpers_2.write)('UPDATE', label));
-                if (config.isDryRun) {
+                if (config.dryrun) {
                     return;
                 }
                 octokit_1.octokit.rest.issues.updateLabel({
@@ -19627,7 +19627,7 @@ function syncRepoLabels() {
                     return;
                 } //  If label is undefined, return
                 core.info((0, helpers_2.write)('DELETE', label));
-                if (config.isDryRun) {
+                if (config.dryrun) {
                     return;
                 }
                 octokit_1.octokit.rest.issues.deleteLabel({
@@ -19659,7 +19659,7 @@ exports.outputs = exports.inputs = void 0;
 //  ========
 /** Metadata inputs */
 exports.inputs = {
-    isDryRun: 'dryrun',
+    dryrun: 'dryrun',
     src: 'src',
     dest: 'dest',
     create: 'create',
