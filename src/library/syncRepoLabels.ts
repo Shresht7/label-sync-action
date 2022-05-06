@@ -7,8 +7,7 @@ import { octokit } from './octokit'
 //  Helpers
 import { getConfigLabels } from './getConfigLabels'
 import { getRepoLabels } from './getRepoLabels'
-import { labelSorter } from '../helpers'
-import { write } from '../helpers'
+import { labelSorter, write, formatColor } from '../helpers'
 
 /** Syncs labels from .github/labels.yaml to the repository */
 export async function syncRepoLabels() {
@@ -40,7 +39,7 @@ export async function syncRepoLabels() {
                 owner,
                 repo,
                 name: label.name,
-                color: label.color || '#000000',
+                color: formatColor(label.color || '#000000'),
                 description: label.description || ''
             })
         })
@@ -63,7 +62,7 @@ export async function syncRepoLabels() {
                 owner,
                 repo,
                 name: label.name,
-                color: label.color || '#000000',
+                color: formatColor(label.color || '#000000'),
                 description: label.description || ''
             })
         })
