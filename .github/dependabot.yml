@@ -14,10 +14,10 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
 
   # NPM
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
