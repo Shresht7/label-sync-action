@@ -61,7 +61,7 @@ This action needs the `GITHUB_TOKEN` secret to use the GitHub API in order to mo
 
 Create a workflow file (e.g. `.github/workflows/label-sync.yaml`) and configure the input parameters.
 
-<!-- slot: example,  prepend: ```yaml, append: ``` -->
+<!-- slot: example,   prepend: ```yaml, append: ``` -->
 ```yaml
 # ============================================
 #                   LABEL-SYNC
@@ -97,7 +97,7 @@ jobs:
       # ================
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Execute label-sync action
       # =========================
